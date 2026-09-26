@@ -1,12 +1,32 @@
 import "server-only";
 import { describeEdits } from "../copy";
-import { addProfileVersion, getActiveProfile, getBrand, listDrafts, listSources } from "../store";
-import { BrandProfileContent, type BrandProfile, type SourceEmail } from "../types";
+import { addProfileVersion, getActiveProfile, getBrand, listDocs, listDrafts, listSources } from "../store";
+import { BrandProfileContent, type BrandDoc, type BrandProfile, type SourceEmail } from "../types";
 import { runStructured, type Progress } from "./client";
 import { PROFILE_INSTRUCTIONS, profileRequestMessage } from "./prompts";
 
-// Keep the extraction request comfortably sized: plenty for dozens of emails.
+// Keep the extraction request comfortably sized: plenty for dozens of emails
+// plus a long style guide. Documents get their own budget.
 const MAX_SOURCE_CHARS = 400_000;
+const MAX_DOC_CHARS = 200_000;
+
+/** Fits documents into their budget, style guides first; cuts are marked in the text. */
+function fitDocs(docs: BrandDoc[]): { docs: BrandDoc[]; cut: boolean } {
+  let left = MAX_DOC_CHARS;
+  let cut = false;
+  const out: BrandDoc[] = [];
+  for (const d of docs) {
+    if (left <= 0) {
+      cut = true;
+      break;
+    }
+    const content = d.content.length > left ? `${d.content.slice(0, left)}\n[… the rest of this document was left out to fit]` : d.content;
+    if (content !== d.content) cut = true;
+    left -= content.length;
+    out.push({ ...d, content });
+  }
+  return { docs: out, cut };
+}
 
 function pickSources(all: SourceEmail[]) {
   // Favourites first, then newest. Everything that fits goes in.
@@ -27,10 +47,16 @@ function pickSources(all: SourceEmail[]) {
  */
 export async function buildProfile(opts: { brandId: string; onProgress?: Progress; signal?: AbortSignal }): Promise<BrandProfile> {
   const brand = await getBrand(opts.brandId);
-  const [sources, current, drafts] = await Promise.all([listSources(brand.id), getActiveProfile(brand), listDrafts(brand.id)]);
-  if (sources.length === 0) throw new Error("Add at least one past email before building a profile.");
+  const [sources, current, drafts, allDocs] = await Promise.all([
+    listSources(brand.id),
+    getActiveProfile(brand),
+    listDrafts(brand.id),
+    listDocs(brand.id),
+  ]);
+  if (sources.length === 0 && allDocs.length === 0) throw new Error("Add at least one past email or brand document before building a profile.");
 
   const { picked, omitted } = pickSources(sources);
+  const { docs, cut } = fitDocs(allDocs);
 
   const editNotes = drafts
     .filter((d) => d.status === "final")
@@ -43,7 +69,7 @@ export async function buildProfile(opts: { brandId: string; onProgress?: Progres
     schema: BrandProfileContent,
     effort: "high", // one-off and quality-critical
     system: [{ type: "text", text: PROFILE_INSTRUCTIONS }],
-    messages: [{ role: "user", content: profileRequestMessage({ brand, sources: picked, omitted, current, editNotes }) }],
+    messages: [{ role: "user", content: profileRequestMessage({ brand, sources: picked, docs, omitted, current, editNotes }) }],
     phaseOf: (partial) => (partial.includes('"structure"') ? "Mapping email structure…" : partial.includes('"mechanics"') ? "Analysing style…" : "Reading the emails…"),
     onProgress: opts.onProgress,
     signal: opts.signal,
@@ -53,9 +79,13 @@ export async function buildProfile(opts: { brandId: string; onProgress?: Progres
     createdBy: "ai",
     parentVersion: current?.version ?? null,
     sourceIds: picked.map((s) => s.id),
-    note: current
-      ? `Refreshed from ${picked.length} emails${editNotes.length ? ` and ${editNotes.length} edited drafts` : ""}`
-      : `Built from ${picked.length} emails`,
+    note: [
+      `${current ? "Refreshed" : "Built"} from ${picked.length} emails`,
+      docs.length ? `${docs.length} document${docs.length === 1 ? "" : "s"}${cut ? " (long documents shortened)" : ""}` : "",
+      editNotes.length ? `${editNotes.length} edited drafts` : "",
+    ]
+      .filter(Boolean)
+      .join(", "),
     profile: data,
   });
 }

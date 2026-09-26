@@ -34,7 +34,8 @@ One user picks a brand, writes a short brief, and gets back a complete, structur
 
 | Concept | What it is |
 |---|---|
-| **Brand** | Name, description, palette, hard rules, active profile version. |
+| **Brand** | Name, description, audience, email platform, palette, hard rules, active profile version. |
+| **Brand document** | Style guide, product/offer info or other reference, stored as extracted text. It can be sent with every email or used only for the profile. |
 | **Source email** | A past email (from paste, `.html`, `.eml`, `.txt`/`.md` or screenshot), normalised to subject + preview + light-Markdown body, and tagged with an email type. It can be a favourite. |
 | **Brand Profile** | A versioned, editable description of the voice, extracted by Claude from the sources. Versions are never overwritten, and any version can be made active again. |
 | **Brief** | Email type + optional goal, offer, products, deadline, audience, must-include, avoid, tone nudge and notes. |
@@ -201,9 +202,28 @@ If the type is "Auto-detect", a low-effort classification call picks it. The ori
 | Tested against the real Claude API | **Not yet**: this environment had no API key. It was tested against a mock server that uses the same request and response format. |
 | Voice-match evaluation on the client's brands | To do after setup |
 
+## 12a. v2.1: ideas taken from the client's prompt template
+
+The client's "Reusable Email Copy Prompt Template" (role → source documents → voice extraction → examples with results → output spec → self-review) led to four additions:
+
+| Template idea | In the app |
+|---|---|
+| Role: audience, "used in Klaviyo" | Brand fields **Audience** and **Email platform**, included in every prompt. |
+| Step 1: style guide + product info documents | **Brand documents** tab: PDF (text layer via `unpdf`, with a Claude fallback for scanned PDFs), .docx (`mammoth`), text, HTML and images. Stored as text in `data/docs/<brand>/`. All documents feed the profile build (200k-char budget). Documents marked *send with every email* form a cached system block (100k-char budget; any cut is marked in the prompt and shown in the UI). Explicit style-guide rules count as hard rules, and product facts may be used without placeholders. |
+| Step 3: examples with results ("32% CTR") | A **performance note** on each past email, shown to the model as `Result:`. Noted emails rank right after favourites in example selection and weigh more in profile extraction. |
+| Step 4: target CTA, length | Brief fields **Main CTA button** and **Length** (presets). |
+| Step 5: self-review pass | **Review & improve**, plus an optional auto-review setting. It checks 6 criteria (voice, one clear action, sounds human, subject/preview pull, no invented facts, rules and brief) together with the lint results, and returns structured `checks` plus a revised draft. The prompt says to fix only what fails and leave passing text word for word; locks are enforced in code afterwards. `generated` keeps the previous AI text for blocks the review left alone, so edit diffs stay accurate. |
+
+Deliberate differences from the template:
+- **Voice extraction is persistent**: it is done once and stored as an editable profile, instead of being redone on every request. That makes the voice consistent between emails and cheaper to produce.
+- **Examples are sent in full.** The template says to write "using only the voice signals"; the app treats real examples as the strongest evidence of the voice.
+- **"One CTA"** is read as one *main action*. Per-product buttons are allowed if they lead to the same action.
+- **The review is a separate request**, not a follow-up in the same conversation. It shares the cached prompt prefix, so the extra cost is mostly its output.
+
 ## 13. Later
 
 - Export in formats specific to Klaviyo or Mailchimp, or push copy straight into a template.
+- Klaviyo **forms/pop-up** copy as a separate output type.
 - Use open and click rates to weight which examples are chosen.
 - Multi-email sequences (teaser → launch → last call) from one brief.
 - A packaged `.exe` (Electron) if installing Node.js turns out to be a barrier for the client.

@@ -14,6 +14,7 @@ export function SourcesTab({ data, reload, goToProfile }: { data: BrandData; rel
   const [text, setText] = useState("");
   const [emailType, setEmailType] = useState<string>("auto");
   const [favorite, setFavorite] = useState(false);
+  const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ ok: number; failed: { name: string; error: string }[] } | null>(null);
   const [error, setError] = useState("");
@@ -30,6 +31,7 @@ export function SourcesTab({ data, reload, goToProfile }: { data: BrandData; rel
     form.append("text", text);
     form.append("emailType", emailType);
     form.append("favorite", String(favorite));
+    form.append("note", note);
     try {
       const res = await api<{ created: SourceEmail[]; failed: { name: string; error: string }[] }>(`/api/brands/${brand.id}/sources`, {
         method: "POST",
@@ -39,6 +41,7 @@ export function SourcesTab({ data, reload, goToProfile }: { data: BrandData; rel
       if (res.created.length) {
         setFiles([]);
         setText("");
+        setNote("");
       }
       await reload();
     } catch (e) {
@@ -119,6 +122,10 @@ export function SourcesTab({ data, reload, goToProfile }: { data: BrandData; rel
                 </option>
               ))}
             </select>
+          </label>
+          <label className="field" style={{ width: 260 }}>
+            <span>How it performed (optional)</span>
+            <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. 32% CTR, best Q2 campaign" />
           </label>
           <label className="check" style={{ marginTop: 22 }}>
             <input type="checkbox" checked={favorite} onChange={(e) => setFavorite(e.target.checked)} /> Mark as favourite (strongest on-voice examples)
@@ -204,6 +211,11 @@ function SourceItem({ source, reload }: { source: SourceEmail; reload: () => Pro
           {title}
         </span>
         <span className="spacer" />
+        {source.note && (
+          <span className="badge ok" title="How this email performed">
+            ▲ {source.note}
+          </span>
+        )}
         {source.origin === "final" && <span className="badge accent">Written here</span>}
         <select
           style={{ width: 170, height: 28, padding: "2px 8px", fontSize: 12.5 }}
@@ -228,7 +240,7 @@ function SourceItem({ source, reload }: { source: SourceEmail; reload: () => Pro
           <pre>{source.body}</pre>
           <div className="row" style={{ marginTop: 8 }}>
             <button className="btn sm" onClick={() => { setDraft(source); setEditing(true); }}>
-              Edit text
+              Edit
             </button>
             <button
               className="btn sm danger"
@@ -255,6 +267,11 @@ function SourceItem({ source, reload }: { source: SourceEmail; reload: () => Pro
             <input value={draft.preview} onChange={(e) => setDraft({ ...draft, preview: e.target.value })} />
           </label>
           <label className="field">
+            <span>How it performed</span>
+            <small>E.g. open rate, click rate, revenue. Emails with a result are preferred as examples and weigh more in the voice profile.</small>
+            <input value={draft.note} placeholder="e.g. 32% CTR" onChange={(e) => setDraft({ ...draft, note: e.target.value })} />
+          </label>
+          <label className="field">
             <span>Body</span>
             <AutoText minRows={6} value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} />
           </label>
@@ -262,7 +279,7 @@ function SourceItem({ source, reload }: { source: SourceEmail; reload: () => Pro
             <button
               className="btn primary sm"
               onClick={async () => {
-                await patch({ subject: draft.subject, preview: draft.preview, body: draft.body });
+                await patch({ subject: draft.subject, preview: draft.preview, body: draft.body, note: draft.note.trim() });
                 setEditing(false);
               }}
             >

@@ -109,7 +109,13 @@ function fromText(kind: Kind, s: string): unknown {
 // ---------- Component ----------
 
 export function ProfileTab({ data, reload }: { data: BrandData; reload: () => Promise<void> }) {
-  const { brand, sources, profile, versions, finalsSinceProfile } = data;
+  const { brand, sources, docs, profile, versions, finalsSinceProfile } = data;
+  const material = [
+    sources.length ? `${sources.length} email${sources.length === 1 ? "" : "s"}` : "",
+    docs.length ? `${docs.length} document${docs.length === 1 ? "" : "s"}` : "",
+  ]
+    .filter(Boolean)
+    .join(" and ");
   const [progress, setProgress] = useState<JobProgress | null>(null);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState<BrandProfileContent | null>(null);
@@ -168,7 +174,7 @@ export function ProfileTab({ data, reload }: { data: BrandData; reload: () => Pr
     return (
       <div className="card stack" style={{ maxWidth: 640 }}>
         <h2>{profile ? "Refreshing" : "Building"} the voice profile…</h2>
-        <p className="muted">Claude is reading {sources.length} emails and working out how {brand.name} writes. This usually takes 30–90 seconds.</p>
+        <p className="muted">Claude is reading {material} and working out how {brand.name} writes. This usually takes 30–90 seconds.</p>
         <Progress progress={progress} onCancel={() => abort.current?.abort()} />
       </div>
     );
@@ -181,11 +187,11 @@ export function ProfileTab({ data, reload }: { data: BrandData; reload: () => Pr
         <div className="empty">
           <h3>No voice profile yet</h3>
           <p>
-            {sources.length === 0
-              ? "Add some past emails first (tab 1)."
-              : `Claude will read the ${sources.length} email${sources.length === 1 ? "" : "s"} in the library and write down how ${brand.name} writes. You can edit everything afterwards.`}
+            {!material
+              ? "Add some past emails (tab 1) or brand documents (tab 2) first."
+              : `Claude will read the ${material} and write down how ${brand.name} writes. You can edit everything afterwards.`}
           </p>
-          <button className="btn primary" style={{ marginTop: 14 }} disabled={!sources.length} onClick={build}>
+          <button className="btn primary" style={{ marginTop: 14 }} disabled={!material} onClick={build}>
             Build voice profile
           </button>
           {sources.length > 0 && sources.length < 5 && <p className="small faint" style={{ marginTop: 8 }}>Tip: 5 or more emails give a much better profile.</p>}
@@ -272,7 +278,7 @@ export function ProfileTab({ data, reload }: { data: BrandData; reload: () => Pr
               <button className="btn" onClick={startEdit}>
                 Edit
               </button>
-              <button className="btn" onClick={build} title="Re-read all emails (and your edits to finished drafts) and update the profile">
+              <button className="btn" onClick={build} title="Re-read all emails and documents (and your edits to finished drafts) and update the profile">
                 Refresh with AI
               </button>
             </>

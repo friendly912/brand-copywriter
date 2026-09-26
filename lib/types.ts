@@ -26,6 +26,8 @@ export const Brand = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().default(""),
+  audience: z.string().default(""),
+  platform: z.string().default(""),
   palette: z.array(PaletteColor).default([]),
   rules: HardRules,
   activeProfileVersion: z.number().int().nullable().default(null),
@@ -71,10 +73,37 @@ export const SourceEmail = z.object({
   origin: z.enum(["upload", "final"]),
   fileName: z.string().nullable().default(null),
   favorite: z.boolean().default(false),
+  /** How the email performed, e.g. "32% CTR" or "best campaign of Q2". Shown to the model with the example. */
   note: z.string().default(""),
   createdAt: z.string(),
 });
 export type SourceEmail = z.infer<typeof SourceEmail>;
+
+// ---------- Brand documents (style guides, product / offer info) ----------
+
+export const DOC_KINDS = ["style_guide", "product_info", "other"] as const;
+export type DocKind = (typeof DOC_KINDS)[number];
+export const DOC_KIND_LABELS: Record<DocKind, string> = {
+  style_guide: "Style guide / brand voice",
+  product_info: "Product / offer info",
+  other: "Other reference",
+};
+
+export const BrandDoc = z.object({
+  id: z.string(),
+  brandId: z.string(),
+  kind: z.enum(DOC_KINDS),
+  title: z.string(),
+  content: z.string(),
+  fileName: z.string().nullable().default(null),
+  /** Sent with every email request (style guides: yes; a huge catalogue: maybe not). Always used for the profile. */
+  useWhenWriting: z.boolean().default(true),
+  createdAt: z.string(),
+});
+export type BrandDoc = z.infer<typeof BrandDoc>;
+
+/** Budget for documents sent with each writing request (~25k tokens). Longer docs are cut at this point, and the UI says so. */
+export const WRITING_DOCS_CHAR_LIMIT = 100_000;
 
 // ---------- Brand profile (also the structured-output schema for extraction) ----------
 // Structured outputs don't support records/maps, so per-type data is a list of {email_type, ...}.
@@ -183,9 +212,19 @@ export const Brief = z.object({
   mustInclude: z.string().default(""),
   avoid: z.string().default(""),
   toneNudge: z.string().default(""),
+  targetCta: z.string().default(""),
+  length: z.string().default(""),
   notes: z.string().default(""),
 });
 export type Brief = z.infer<typeof Brief>;
+
+export const LENGTH_OPTIONS = [
+  { value: "", label: "Brand's usual length" },
+  { value: "very short: body under 60 words", label: "Very short (under 60 words)" },
+  { value: "short and scannable: body under 120 words", label: "Short (under 120 words)" },
+  { value: "medium: body 120-250 words", label: "Medium (120–250 words)" },
+  { value: "long-form: body 250+ words, storytelling allowed", label: "Long (250+ words)" },
+] as const;
 
 export const Usage = z.object({
   model: z.string(),
@@ -207,6 +246,30 @@ export type LintIssue = z.infer<typeof LintIssue>;
 /** Keys of editable blocks inside a draft: "subjects", "header", "closing", or "section:<key>". */
 export type BlockKey = string;
 
+// ---------- Review pass ----------
+
+export const ReviewCheck = z.object({
+  criterion: z.string(),
+  pass: z.boolean(),
+  note: z.string().describe("One or two sentences: what passed or what was wrong and how it was fixed"),
+});
+
+/** Structured-output schema for the self-review pass. */
+export const ReviewOutput = z.object({
+  checks: z.array(ReviewCheck),
+  changed: z.boolean().describe("true if the revised draft differs from the input draft"),
+  summary: z.string().describe("One sentence for the user"),
+  revised: EmailCopy,
+});
+
+export const DraftReview = z.object({
+  checks: z.array(ReviewCheck),
+  changed: z.boolean(),
+  summary: z.string(),
+  createdAt: z.string(),
+});
+export type DraftReview = z.infer<typeof DraftReview>;
+
 export const Revision = z.object({
   block: z.string(),
   instruction: z.string(),
@@ -227,6 +290,7 @@ export const Draft = z.object({
   revisions: z.array(Revision).default([]),
   status: z.enum(["draft", "final"]),
   finalSourceId: z.string().nullable().default(null),
+  review: DraftReview.nullable().default(null),
   usage: z.array(Usage).default([]),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -246,6 +310,8 @@ export const Settings = z.object({
   effort: z.enum(["low", "medium", "high"]).default("medium"),
   examplesPerPrompt: z.number().int().min(1).max(15).default(6),
   refreshAfterFinals: z.number().int().min(1).default(5),
+  /** Run the self-review pass automatically after every new email. */
+  autoReview: z.boolean().default(false),
 });
 export type Settings = z.infer<typeof Settings>;
 

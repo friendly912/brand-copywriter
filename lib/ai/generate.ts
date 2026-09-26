@@ -1,14 +1,18 @@
 import "server-only";
 import type { BetaTextBlockParam } from "@anthropic-ai/sdk/resources/beta/messages/messages";
 import type { z } from "zod";
-import { getActiveProfile, getBrand, getDraft, getSettings, listSources, newId, now, saveDraft } from "../store";
+import { flattenCopy } from "../copy";
+import { lintCopy } from "../lint";
+import { getActiveProfile, getBrand, getDraft, getSettings, listDocs, listSources, newId, now, saveDraft } from "../store";
 import {
   ClosingBlockRegen,
   CopySection,
   EmailCopy,
   HeaderBlockRegen,
+  ReviewOutput,
   SubjectBlockRegen,
   type Brand,
+  type BrandDoc,
   type BrandProfile,
   type Brief,
   type Draft,
@@ -16,32 +20,37 @@ import {
   type SourceEmail,
 } from "../types";
 import { runStructured, type Progress } from "./client";
-import { BLOCK_DESCRIPTIONS, COPYWRITER_INSTRUCTIONS, brandBlock, briefMessage, examplesBlock, regenerateMessage } from "./prompts";
+import { BLOCK_DESCRIPTIONS, COPYWRITER_INSTRUCTIONS, brandBlock, briefMessage, docsBlock, examplesBlock, regenerateMessage, reviewMessage } from "./prompts";
 
 /**
- * Picks up to k examples: favourites of the same type, then finals of the same type,
- * then other emails of the same type, then favourites/others of other types.
- * Deterministic for the same data, so the cached prompt prefix is reused.
+ * Picks up to k examples: same-type favourites, then same-type emails with a
+ * performance result, then same-type finals, then other same-type emails, then
+ * favourites / results / finals of other types. Deterministic for the same data,
+ * so the cached prompt prefix is reused.
  */
 export function selectExamples(sources: SourceEmail[], type: EmailType, k: number): SourceEmail[] {
   const tier = (s: SourceEmail) => {
     const same = s.emailType === type;
+    const proven = !!s.note.trim();
     if (same && s.favorite) return 0;
-    if (same && s.origin === "final") return 1;
-    if (same) return 2;
-    if (s.favorite) return 3;
-    if (s.origin === "final") return 4;
-    return 5;
+    if (same && proven) return 1;
+    if (same && s.origin === "final") return 2;
+    if (same) return 3;
+    if (s.favorite) return 4;
+    if (proven) return 5;
+    if (s.origin === "final") return 6;
+    return 7;
   };
   return [...sources]
     .sort((a, b) => tier(a) - tier(b) || b.createdAt.localeCompare(a.createdAt) || a.id.localeCompare(b.id))
     .slice(0, k);
 }
 
-function systemBlocks(brand: Brand, profile: BrandProfile | null, examples: SourceEmail[]): BetaTextBlockParam[] {
+function systemBlocks(brand: Brand, profile: BrandProfile | null, docs: BrandDoc[], examples: SourceEmail[]): BetaTextBlockParam[] {
   return [
     { type: "text", text: COPYWRITER_INSTRUCTIONS },
     { type: "text", text: brandBlock(brand, profile) },
+    { type: "text", text: docsBlock(docs).text },
     { type: "text", text: examplesBlock(examples), cache_control: { type: "ephemeral" } },
   ];
 }
@@ -56,8 +65,8 @@ function phaseOf(partial: string): string {
 
 async function loadContext(brandId: string) {
   const brand = await getBrand(brandId);
-  const [profile, sources, settings] = await Promise.all([getActiveProfile(brand), listSources(brandId), getSettings()]);
-  return { brand, profile, sources, settings };
+  const [profile, sources, docs, settings] = await Promise.all([getActiveProfile(brand), listSources(brandId), listDocs(brandId), getSettings()]);
+  return { brand, profile, sources, docs, settings };
 }
 
 /** Writes a brand-new email. If `previous` is given, its locked blocks are kept. */
@@ -68,12 +77,12 @@ export async function generateDraft(opts: {
   onProgress?: Progress;
   signal?: AbortSignal;
 }): Promise<Draft> {
-  const { brand, profile, sources, settings } = await loadContext(opts.brandId);
+  const { brand, profile, sources, docs, settings } = await loadContext(opts.brandId);
   const examples = selectExamples(sources, opts.brief.emailType, settings.examplesPerPrompt);
 
   const { data, usage } = await runStructured({
     schema: EmailCopy,
-    system: systemBlocks(brand, profile, examples),
+    system: systemBlocks(brand, profile, docs, examples),
     messages: [{ role: "user", content: briefMessage(opts.brief) }],
     phaseOf,
     onProgress: opts.onProgress,
@@ -97,11 +106,16 @@ export async function generateDraft(opts: {
     revisions: [...(prev?.revisions ?? []), ...(prev ? [{ block: "all", instruction: "", createdAt: now() }] : [])],
     status: "draft",
     finalSourceId: null,
+    review: null, // a fresh draft hasn't been reviewed
     usage: [...(prev?.usage ?? []), usage],
     createdAt: prev?.createdAt ?? now(),
     updatedAt: now(),
   };
   await saveDraft(draft);
+
+  if (settings.autoReview) {
+    return reviewDraft({ draftId: draft.id, onProgress: opts.onProgress, signal: opts.signal });
+  }
   return draft;
 }
 
@@ -138,7 +152,7 @@ export async function regenerateBlock(opts: {
 }): Promise<Draft> {
   const draft = await getDraft(opts.draftId);
   const current = opts.current ?? draft.current;
-  const { brand, profile, sources } = await loadContext(draft.brandId);
+  const { brand, profile, sources, docs } = await loadContext(draft.brandId);
 
   // Reuse the draft's own examples so the cached prompt prefix from the first generation is hit.
   const byId = new Map(sources.map((s) => [s.id, s]));
@@ -167,7 +181,7 @@ export async function regenerateBlock(opts: {
 
   const { data, usage } = await runStructured({
     schema,
-    system: systemBlocks(brand, profile, examples),
+    system: systemBlocks(brand, profile, docs, examples),
     messages: [
       {
         role: "user",
@@ -213,4 +227,76 @@ function applyBlock(copy: EmailCopy, block: string, data: unknown): EmailCopy {
     Object.assign(next, data as z.infer<typeof ClosingBlockRegen>);
   }
   return next;
+}
+
+/** Blocks of an email as comparable units: subjects, header, closing and each section. */
+function blocksOf(c: EmailCopy): Map<string, string> {
+  const m = new Map<string, string>();
+  m.set("subjects", JSON.stringify(c.subject_lines));
+  m.set("header", JSON.stringify([c.headline, c.subheadline]));
+  m.set("closing", JSON.stringify([c.primary_cta, c.ps, c.footer_line]));
+  for (const s of c.sections) m.set(`section:${s.key}`, JSON.stringify(s));
+  return m;
+}
+
+/**
+ * Keeps `generated` meaning "the latest AI-written text": blocks the review left
+ * untouched keep their previous AI text, so the user's own edits still show up
+ * as edits when the draft is finalised.
+ */
+function mergeGenerated(oldGenerated: EmailCopy, current: EmailCopy, revised: EmailCopy): EmailCopy {
+  const before = blocksOf(current);
+  const after = blocksOf(revised);
+  let out: EmailCopy = structuredClone(revised);
+  const unchanged = [...after.keys()].filter((k) => before.get(k) === after.get(k));
+  out = keepLocked(out, oldGenerated, unchanged);
+  return out;
+}
+
+function reviewPhase(partial: string): string {
+  return partial.includes('"revised"') ? "Revising what didn't pass…" : "Reviewing the draft…";
+}
+
+/**
+ * Self-review pass: checks the draft against the review criteria (plus the
+ * automatic rule checks) and fixes only what fails. Locked blocks are never changed.
+ */
+export async function reviewDraft(opts: { draftId: string; current?: EmailCopy; onProgress?: Progress; signal?: AbortSignal }): Promise<Draft> {
+  const draft = await getDraft(opts.draftId);
+  const current = opts.current ?? draft.current;
+  const { brand, profile, sources, docs } = await loadContext(draft.brandId);
+  const byId = new Map(sources.map((s) => [s.id, s]));
+  const examples = draft.exampleIds.map((id) => byId.get(id)).filter((s): s is SourceEmail => !!s);
+  const lintNotes = lintCopy(current, brand, profile).map((i) => `${i.where}: ${i.message}`);
+
+  const { data, usage } = await runStructured({
+    schema: ReviewOutput,
+    system: systemBlocks(brand, profile, docs, examples),
+    messages: [
+      {
+        role: "user",
+        content: reviewMessage({ brief: draft.brief, currentJson: JSON.stringify(current, null, 2), lintNotes, locked: draft.locked }),
+      },
+    ],
+    phaseOf: reviewPhase,
+    onProgress: opts.onProgress,
+    signal: opts.signal,
+  });
+
+  // Enforce locks and the subject count even if the model drifted.
+  let revised = keepLocked(data.revised, current, draft.locked);
+  if (revised.subject_lines.length === 0) revised = { ...revised, subject_lines: current.subject_lines };
+  const changed = JSON.stringify(flattenCopy(revised)) !== JSON.stringify(flattenCopy(current));
+
+  const updated: Draft = {
+    ...draft,
+    current: revised,
+    generated: changed ? mergeGenerated(draft.generated, current, revised) : draft.generated,
+    chosenSubject: Math.min(draft.chosenSubject, revised.subject_lines.length - 1),
+    review: { checks: data.checks, changed, summary: data.summary, createdAt: now() },
+    revisions: [...draft.revisions, { block: "review", instruction: "", createdAt: now() }],
+    usage: [...draft.usage, usage],
+  };
+  await saveDraft(updated);
+  return updated;
 }

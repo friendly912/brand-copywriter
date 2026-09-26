@@ -226,6 +226,10 @@ input.headline { font-size: 20px; font-weight: 700; padding: 8px 10px; }
 .lint { display: flex; flex-direction: column; gap: 4px; }
 .lint li { list-style: none; display: flex; gap: 8px; align-items: baseline; }
 .lint ul { margin: 0; padding: 0; }
+.review-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.review-list li { display: grid; grid-template-columns: 20px 1fr; gap: 6px; }
+.review-list .pass { color: var(--ok); font-weight: 700; }
+.review-list .fail { color: var(--warn); font-weight: 700; }
 .toolbar { position: sticky; top: 52px; z-index: 5; background: var(--bg); padding: 10px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
 table.list { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }

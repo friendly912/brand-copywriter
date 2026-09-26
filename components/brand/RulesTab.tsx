@@ -13,6 +13,8 @@ export function RulesTab({ brand, onSaved }: { brand: Brand; onSaved: () => Prom
   const toast = useToast();
   const [name, setName] = useState(brand.name);
   const [description, setDescription] = useState(brand.description);
+  const [audience, setAudience] = useState(brand.audience);
+  const [platform, setPlatform] = useState(brand.platform);
   const [palette, setPalette] = useState<PaletteColor[]>(brand.palette);
   const [rules, setRules] = useState(brand.rules);
   const [banned, setBanned] = useState(brand.rules.bannedWords.join(", "));
@@ -29,6 +31,8 @@ export function RulesTab({ brand, onSaved }: { brand: Brand; onSaved: () => Prom
         json: {
           name,
           description,
+          audience,
+          platform,
           palette,
           rules: {
             ...rules,
@@ -59,6 +63,20 @@ export function RulesTab({ brand, onSaved }: { brand: Brand; onSaved: () => Prom
           <span>What the brand is</span>
           <small>Context Claude gets on every email: what it sells, who it's for.</small>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+        </label>
+        <label className="field">
+          <span>Audience</span>
+          <small>Who the emails are for. A brief can still target a narrower segment.</small>
+          <input value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="e.g. US e-commerce shoppers aged 25–40" />
+        </label>
+        <label className="field" style={{ maxWidth: 300 }}>
+          <span>Email platform</span>
+          <input value={platform} onChange={(e) => setPlatform(e.target.value)} placeholder="e.g. Klaviyo" list="platforms" />
+          <datalist id="platforms">
+            {["Klaviyo", "Mailchimp", "Shopify Email", "Omnisend", "HubSpot", "Brevo"].map((x) => (
+              <option key={x} value={x} />
+            ))}
+          </datalist>
         </label>
       </div>
 

@@ -113,6 +113,16 @@ export default function SettingsPage() {
               <option value="high">High (most careful)</option>
             </select>
           </label>
+          <label className="check" style={{ alignItems: "flex-start" }}>
+            <input type="checkbox" checked={s.autoReview} onChange={(e) => save({ autoReview: e.target.checked })} style={{ marginTop: 3 }} />
+            <span>
+              <strong>Review every new email automatically</strong>
+              <br />
+              <span className="small muted">
+                After writing, Claude checks the draft for voice, one clear CTA, generic-sounding copy, subject/preview pull, invented facts and your rules, and fixes what fails. It takes roughly twice as long and costs about twice as much per email. You can also run it on demand with <em>Review &amp; improve</em>.
+              </span>
+            </span>
+          </label>
           <label className="field">
             <span>Example emails per request</span>
             <small>How many past emails Claude sees when writing. Same-type favourites are picked first.</small>

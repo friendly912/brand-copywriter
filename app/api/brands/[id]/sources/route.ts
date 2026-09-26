@@ -24,6 +24,7 @@ async function extract(fileName: string, data: Buffer): Promise<IngestedEmail> {
  *   text     - pasted email copy (may start with "Subject:" / "Preview:" lines)
  *   emailType - one of EMAIL_TYPES, or "auto" to let Claude pick
  *   favorite - "true" to mark as a favourite example
+ *   note     - optional performance result, e.g. "32% CTR"
  */
 export const POST = route(async (req: Request, { params }: Ctx<{ id: string }>) => {
   const { id } = await params;
@@ -32,6 +33,7 @@ export const POST = route(async (req: Request, { params }: Ctx<{ id: string }>) 
   const typeField = String(form.get("emailType") ?? "auto");
   const chosenType = (EMAIL_TYPES as readonly string[]).includes(typeField) ? (typeField as EmailType) : null;
   const favorite = form.get("favorite") === "true";
+  const note = String(form.get("note") ?? "").trim();
 
   const created: SourceEmail[] = [];
   const failed: { name: string; error: string }[] = [];
@@ -51,7 +53,7 @@ export const POST = route(async (req: Request, { params }: Ctx<{ id: string }>) 
         origin: "upload",
         fileName: name,
         favorite,
-        note: "",
+        note,
         createdAt: now(),
       };
       await saveSource(source);

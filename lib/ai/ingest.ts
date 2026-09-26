@@ -3,7 +3,7 @@ import { convert } from "html-to-text";
 import PostalMime from "postal-mime";
 import { z } from "zod";
 import { EMAIL_TYPES, type EmailType } from "../types";
-import { runStructured } from "./client";
+import { runStructured, runText } from "./client";
 import { INGEST_INSTRUCTIONS, typeList } from "./prompts";
 
 export interface IngestedEmail {
@@ -137,4 +137,70 @@ export async function detectType(copy: { subject: string; body: string }): Promi
     messages: [{ role: "user", content: `Subject: ${copy.subject}\n\n${copy.body.slice(0, 6000)}` }],
   });
   return toEmailType(data.email_type);
+}
+
+// ---------------------------------------------------------------------------
+// Brand documents (style guides, product info): PDF, Word, HTML, text, images
+// ---------------------------------------------------------------------------
+
+export const DOC_EXTENSIONS = ["pdf", "docx", "txt", "md", "html", "htm", "png", "jpg", "jpeg", "webp", "gif"];
+
+const TRANSCRIBE_DOC = `Transcribe all the text of this brand document faithfully as clean Markdown (headings, lists, tables). Do not summarise, rewrite or add commentary. Skip page numbers and repeated headers/footers. Describe nothing visual unless it contains words.`;
+
+/** Extracts readable text from an uploaded document. Scanned PDFs and images go through Claude. */
+export async function docToText(fileName: string, data: Buffer): Promise<string> {
+  const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
+
+  if (ext === "pdf") {
+    const { extractText, getDocumentProxy } = await import("unpdf");
+    const pdf = await getDocumentProxy(new Uint8Array(data));
+    const { text, totalPages } = await extractText(pdf, { mergePages: true });
+    const clean = tidy(text);
+    // Almost no text per page means a scanned or image-only PDF: let Claude read it.
+    if (clean.length >= 100 * Math.min(totalPages, 3)) return clean;
+    const { text: read } = await runText({
+      system: TRANSCRIBE_DOC,
+      content: [
+        { type: "document", source: { type: "base64", media_type: "application/pdf", data: data.toString("base64") } },
+        { type: "text", text: "Transcribe this document." },
+      ],
+      maxTokens: 64000,
+    });
+    return tidy(read);
+  }
+
+  if (ext === "docx") {
+    const mammoth = await import("mammoth");
+    const { value } = await mammoth.extractRawText({ buffer: data });
+    return tidy(value);
+  }
+
+  if (ext === "html" || ext === "htm") {
+    return tidy(convert(data.toString("utf8"), { wordwrap: false, selectors: [{ selector: "img", format: "skip" }, { selector: "a", options: { ignoreHref: true } }] }));
+  }
+
+  if (ext === "txt" || ext === "md") return tidy(data.toString("utf8"));
+
+  const media = IMAGE_TYPES[ext];
+  if (media) {
+    const { text } = await runText({
+      system: TRANSCRIBE_DOC,
+      content: [
+        { type: "image", source: { type: "base64", media_type: media, data: data.toString("base64") } },
+        { type: "text", text: "Transcribe this document." },
+      ],
+    });
+    return tidy(text);
+  }
+
+  if (ext === "doc") throw new Error("Old .doc files aren't supported. Save it as .docx or PDF and try again.");
+  throw new Error(`Unsupported file type ".${ext}". Use PDF, .docx, .txt, .md, .html or an image.`);
+}
+
+function tidy(text: string): string {
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }

@@ -23,16 +23,18 @@ Port 3000 already in use? Open a command prompt in the folder and run `set PORT=
 ## Using it
 
 1. **Brands → New brand.** One per brand.
-2. **Past emails.** Add 5–10 or more: drop exported `.html` or `.eml` files or screenshots, or paste the copy. Star the most on-voice ones as favourites.
-3. **Voice profile → Build voice profile.** Claude reads the emails and writes down how the brand writes. Read it, answer the "open questions", and edit anything that's off. Every save is a new version you can roll back to.
-4. **Rules & palette.** Banned words, emoji rule, sign-off, subject/preview length limits, brand colours. Drafts are checked against these automatically.
-5. **Write an email.** Fill in the brief (every field is optional) and click **Write email**.
+2. **Past emails.** Add 5–10 or more: drop exported `.html` or `.eml` files or screenshots, or paste the copy. Star the most on-voice ones as favourites, and note **how an email performed** (e.g. "32% CTR"). Emails with a result are preferred as examples and count for more in the voice profile.
+3. **Brand documents** (optional, recommended). Add the style guide and product/offer info: PDF, Word (.docx), text, HTML or images. Style guides shape the voice profile. Product info gives Claude real product names, features and prices, so it doesn't need placeholders for them. Documents marked **Send with every email** go into every writing request, within a 100k-character budget. Untick it for big catalogues, which are then used only for the voice profile.
+4. **Voice profile → Build voice profile.** Claude reads the emails and documents and writes down how the brand writes. Read it, answer the "open questions", and edit anything that's off. Every save is a new version you can roll back to.
+5. **Rules & palette.** Audience, email platform (e.g. Klaviyo), banned words, emoji rule, sign-off, subject/preview length limits, brand colours. Drafts are checked against these automatically.
+6. **Write an email.** Fill in the brief (every field is optional, including the **main CTA button** text and **length**) and click **Write email**.
    - Pick a subject line with the radio button; edit anything in place (it autosaves).
    - **↻ Rewrite** any block, optionally with an instruction ("more urgent", "shorter").
    - **Lock** blocks you like; **Rewrite whole email** keeps locked blocks.
+   - **✦ Review & improve** checks the draft for voice match, one clear CTA, generic "AI-sounding" copy, subject/preview pull, invented facts and your rules, then fixes only what fails. Locked blocks are never changed. To run it on every new email automatically, turn it on in Settings; that takes about twice as long and costs about twice as much.
    - The warning box flags banned words, over-long subjects and `[placeholders]` to fill in.
    - **Copy text** / **Copy Markdown** copies the whole email with your chosen subject.
-6. **Mark final** when you've sent it. It becomes an example for that brand, and your edits are remembered. After a few finals, **Refresh with AI** on the profile page to fold what you changed back into the voice.
+7. **Mark final** when you've sent it. It becomes an example for that brand, and your edits are remembered. After a few finals, **Refresh with AI** on the profile page to fold what you changed back into the voice.
 
 ## Your data
 
@@ -42,6 +44,7 @@ Everything is stored as plain JSON files in the `data` folder next to `start.bat
 data\settings.json          API key and preferences
 data\brands\                one file per brand (palette, rules)
 data\sources\<brand>\       past emails
+data\docs\<brand>\          brand documents (extracted text)
 data\profiles\<brand>\      voice profile versions
 data\drafts\                every email written
 data\uploads\<brand>\       original uploaded files
@@ -67,7 +70,8 @@ Replace the app files (keep your `data` folder), then double-click **`rebuild.ba
 | Browser shows "can't connect" | Wait a few seconds after the window says it's running, then refresh. |
 | "The Claude API key was rejected" | Paste the key again in Settings; check the key is active in the Claude Console. |
 | "Rate limited" | Wait a minute and retry. |
-| Screenshot came out wrong | Open the email in the library, click **Edit text** and fix it. |
+| Screenshot or scanned PDF came out wrong | Open it in the library or documents list, click **Edit** and fix the text. |
+| Old Word `.doc` file | Save it as `.docx` or PDF first. |
 | Something broken after an update | Run `rebuild.bat`. |
 
 ## For developers
@@ -83,9 +87,9 @@ npm run typecheck
 | Path | What |
 |---|---|
 | `lib/ai/prompts.ts` | All prompts (writing, rewriting, profile extraction, ingestion) |
-| `lib/ai/generate.ts` | Example selection, prompt assembly, full and per-block generation |
+| `lib/ai/generate.ts` | Example selection, prompt assembly, full and per-block generation, review pass |
 | `lib/ai/profile.ts` | Build or refresh the voice profile |
-| `lib/ai/ingest.ts` | HTML / .eml / screenshot → clean copy |
+| `lib/ai/ingest.ts` | HTML / .eml / screenshot → clean copy; PDF / .docx / images → document text |
 | `lib/ai/client.ts` | Claude client, structured-output streaming, cost estimate, error mapping |
 | `lib/types.ts` | Zod schemas for everything stored and everything Claude returns |
 | `lib/lint.ts` | Rule checks on drafts |

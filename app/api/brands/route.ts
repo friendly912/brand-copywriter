@@ -18,12 +18,16 @@ export const GET = route(async () => {
 });
 
 export const POST = route(async (req: Request) => {
-  const input = z.object({ name: z.string().trim().min(1), description: z.string().default("") }).parse(await req.json());
+  const input = z
+    .object({ name: z.string().trim().min(1), description: z.string().default(""), audience: z.string().default(""), platform: z.string().default("") })
+    .parse(await req.json());
   const slug = input.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 24) || "brand";
   const brand: Brand = {
     id: newId(slug),
     name: input.name,
     description: input.description,
+    audience: input.audience,
+    platform: input.platform,
     palette: [],
     rules: HardRules.parse({}),
     activeProfileVersion: null,

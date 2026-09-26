@@ -3,7 +3,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import type { z } from "zod";
-import { Brand, BrandProfile, Draft, Settings, SourceEmail } from "./types";
+import { Brand, BrandDoc, BrandProfile, Draft, Settings, SourceEmail } from "./types";
 
 // Everything lives as plain JSON under ./data (override with BC_DATA_DIR), so it
 // is easy to back up, inspect, or move to another Windows machine.
@@ -11,6 +11,7 @@ import { Brand, BrandProfile, Draft, Settings, SourceEmail } from "./types";
 //   data/settings.json
 //   data/brands/<brandId>.json
 //   data/sources/<brandId>/<sourceId>.json
+//   data/docs/<brandId>/<docId>.json
 //   data/profiles/<brandId>/v0001.json
 //   data/drafts/<draftId>.json
 //   data/uploads/<brandId>/<file>
@@ -111,7 +112,7 @@ export async function saveBrand(brand: Brand) {
 export async function deleteBrand(id: string) {
   assertSafeId(id);
   await fs.rm(p("brands", `${id}.json`), { force: true });
-  for (const dir of ["sources", "profiles", "uploads"]) {
+  for (const dir of ["sources", "docs", "profiles", "uploads"]) {
     await fs.rm(p(dir, id), { recursive: true, force: true });
   }
   for (const d of await listDrafts(id)) await fs.rm(p("drafts", `${d.id}.json`), { force: true });
@@ -152,6 +153,36 @@ export async function saveUpload(brandId: string, fileName: string, data: Buffer
   await fs.mkdir(path.dirname(file), { recursive: true });
   await fs.writeFile(file, data);
   return file;
+}
+
+// ---------- Brand documents ----------
+
+export async function listDocs(brandId: string) {
+  assertSafeId(brandId);
+  const items = await listJson(p("docs", brandId), BrandDoc);
+  // Style guides first, then product info, then other; oldest first within a kind.
+  const order = { style_guide: 0, product_info: 1, other: 2 };
+  return items.sort((a, b) => order[a.kind] - order[b.kind] || a.createdAt.localeCompare(b.createdAt));
+}
+
+export async function getDoc(brandId: string, id: string) {
+  assertSafeId(brandId);
+  assertSafeId(id);
+  const d = await readJson(p("docs", brandId, `${id}.json`), BrandDoc);
+  if (!d) throw new NotFoundError("Document not found");
+  return d;
+}
+
+export async function saveDoc(d: BrandDoc) {
+  assertSafeId(d.brandId);
+  assertSafeId(d.id);
+  await writeJson(p("docs", d.brandId, `${d.id}.json`), BrandDoc.parse(d));
+}
+
+export async function deleteDoc(brandId: string, id: string) {
+  assertSafeId(brandId);
+  assertSafeId(id);
+  await fs.rm(p("docs", brandId, `${id}.json`), { force: true });
 }
 
 // ---------- Profiles (versioned, never overwritten) ----------

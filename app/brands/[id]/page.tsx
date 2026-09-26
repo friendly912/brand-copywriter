@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
+import { DocsTab } from "@/components/brand/DocsTab";
 import { ProfileTab } from "@/components/brand/ProfileTab";
 import { RulesTab } from "@/components/brand/RulesTab";
 import { SourcesTab } from "@/components/brand/SourcesTab";
 import { api } from "@/lib/client";
 import type { BrandData } from "@/components/brand/types";
 
-type Tab = "sources" | "profile" | "rules";
+type Tab = "sources" | "docs" | "profile" | "rules";
 
 function BrandSetup() {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +40,7 @@ function BrandSetup() {
   if (error) return <main className="page"><div className="banner err">{error}</div></main>;
   if (!data) return <main className="page"><p className="muted">Loading…</p></main>;
 
-  const { brand, sources, profile } = data;
+  const { brand, sources, docs, profile } = data;
 
   return (
     <main className="page">
@@ -60,15 +61,19 @@ function BrandSetup() {
         <button className={tab === "sources" ? "active" : ""} onClick={() => switchTab("sources")}>
           1. Past emails<span className="count">{sources.length}</span>
         </button>
+        <button className={tab === "docs" ? "active" : ""} onClick={() => switchTab("docs")}>
+          2. Brand documents<span className="count">{docs.length}</span>
+        </button>
         <button className={tab === "profile" ? "active" : ""} onClick={() => switchTab("profile")}>
-          2. Voice profile{profile && <span className="count">v{profile.version}</span>}
+          3. Voice profile{profile && <span className="count">v{profile.version}</span>}
         </button>
         <button className={tab === "rules" ? "active" : ""} onClick={() => switchTab("rules")}>
-          3. Rules & palette
+          4. Rules & palette
         </button>
       </div>
 
       {tab === "sources" && <SourcesTab data={data} reload={reload} goToProfile={() => switchTab("profile")} />}
+      {tab === "docs" && <DocsTab data={data} reload={reload} goToProfile={() => switchTab("profile")} />}
       {tab === "profile" && <ProfileTab data={data} reload={reload} />}
       {tab === "rules" && <RulesTab brand={brand} onSaved={reload} />}
     </main>

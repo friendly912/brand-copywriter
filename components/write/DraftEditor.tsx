@@ -41,6 +41,7 @@ export function DraftEditor({
   const [chosen, setChosen] = useState(draft.chosenSubject);
   const [locked, setLocked] = useState<string[]>(draft.locked);
   const [regen, setRegen] = useState<{ block: string; progress: JobProgress } | null>(null);
+  const [reviewing, setReviewing] = useState<JobProgress | null>(null);
   const [openBox, setOpenBox] = useState<string | null>(null);
   const [instruction, setInstruction] = useState("");
   const [error, setError] = useState("");
@@ -50,7 +51,7 @@ export function DraftEditor({
   const first = useRef(true);
 
   const isFinal = draft.status === "final";
-  const readOnly = isFinal || busy || !!regen;
+  const readOnly = isFinal || busy || !!regen || !!reviewing;
   const issues = useMemo(() => lintCopy(current, brand, profile), [current, brand, profile]);
   const cost = draft.usage.reduce((n, u) => n + u.costUsd, 0);
 
@@ -93,6 +94,20 @@ export function DraftEditor({
     } catch (e) {
       if ((e as Error).name !== "AbortError") setError(e instanceof ApiError ? e.message : String(e));
       setRegen(null);
+    }
+  }
+
+  async function review() {
+    setError("");
+    setOpenBox(null);
+    setReviewing({ phase: "Reviewing the draft…", chars: 0 });
+    abort.current = new AbortController();
+    try {
+      const d = await streamJob<Draft>(`/api/drafts/${draft.id}/review`, { current }, setReviewing, abort.current.signal);
+      onDraft(d); // remounts this editor with the reviewed copy
+    } catch (e) {
+      if ((e as Error).name !== "AbortError") setError(e instanceof ApiError ? e.message : String(e));
+      setReviewing(null);
     }
   }
 
@@ -162,6 +177,11 @@ export function DraftEditor({
         <button className="btn sm" onClick={() => copyAll("markdown")}>
           Copy Markdown
         </button>
+        {!isFinal && (
+          <button className="btn sm" disabled={readOnly} onClick={review} title="Check voice, CTA, generic phrasing, subject/preview, facts and rules, and fix what fails">
+            ✦ Review &amp; improve
+          </button>
+        )}
         {isFinal ? (
           <button className="btn sm" onClick={reopen}>
             Reopen for editing
@@ -185,6 +205,13 @@ export function DraftEditor({
       </div>
 
       {error && <div className="banner err">{error}</div>}
+      {reviewing && (
+        <div className="card">
+          <Progress progress={reviewing} onCancel={() => abort.current?.abort()} />
+          <p className="small faint" style={{ marginTop: 8 }}>Checking the draft against the brand's voice and the review checklist, then fixing only what fails.</p>
+        </div>
+      )}
+      {draft.review && !reviewing && <ReviewPanel review={draft.review} />}
       {isFinal && (
         <div className="banner ok">
           Final. This email is now one of {brand.name}'s examples. Reopen it to make more changes.
@@ -349,6 +376,41 @@ export function DraftEditor({
             })}
           </ul>
         </div>
+      )}
+    </div>
+  );
+}
+
+function ReviewPanel({ review }: { review: NonNullable<Draft["review"]> }) {
+  const [open, setOpen] = useState(review.checks.some((c) => !c.pass));
+  const passed = review.checks.filter((c) => c.pass).length;
+  return (
+    <div className="block">
+      <div className="block-head">
+        <h3>Review</h3>
+        <span className={`badge ${passed === review.checks.length ? "ok" : "warn"}`}>
+          {passed}/{review.checks.length} passed
+        </span>
+        {review.changed ? <span className="badge accent">Draft revised</span> : <span className="badge">No changes needed</span>}
+        <div className="block-actions">
+          <button className="btn ghost sm" onClick={() => setOpen(!open)}>
+            {open ? "Hide" : "Details"}
+          </button>
+        </div>
+      </div>
+      <p className="small">{review.summary}</p>
+      {open && (
+        <ul className="review-list">
+          {review.checks.map((c, i) => (
+            <li key={i}>
+              <span className={c.pass ? "pass" : "fail"}>{c.pass ? "✓" : "✗"}</span>
+              <div>
+                <strong>{c.criterion}</strong>
+                <div className="small muted">{c.note}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

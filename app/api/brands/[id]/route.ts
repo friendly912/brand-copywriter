@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { route, type Ctx } from "@/lib/http";
-import { deleteBrand, getActiveProfile, getBrand, listDrafts, listProfiles, listSources, saveBrand } from "@/lib/store";
+import { docsBlock } from "@/lib/ai/prompts";
+import { deleteBrand, getActiveProfile, getBrand, listDocs, listDrafts, listProfiles, listSources, saveBrand } from "@/lib/store";
 import { HardRules, PaletteColor } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -10,12 +11,23 @@ type P = Ctx<{ id: string }>;
 export const GET = route(async (_req: Request, { params }: P) => {
   const { id } = await params;
   const brand = await getBrand(id);
-  const [sources, profiles, profile, drafts] = await Promise.all([listSources(id), listProfiles(id), getActiveProfile(brand), listDrafts(id)]);
+  const [sources, profiles, profile, drafts, docs] = await Promise.all([
+    listSources(id),
+    listProfiles(id),
+    getActiveProfile(brand),
+    listDrafts(id),
+    listDocs(id),
+  ]);
   // Finals written since the active profile was built: used to suggest a refresh.
   const finalsSinceProfile = drafts.filter((d) => d.status === "final" && (!profile || d.updatedAt > profile.createdAt)).length;
   return {
     brand,
     sources,
+    docs,
+    writingDocs: {
+      chars: docs.filter((d) => d.useWhenWriting).reduce((n, d) => n + d.content.length, 0),
+      truncated: docsBlock(docs).truncated,
+    },
     profile,
     versions: profiles.map(({ profile: _p, ...meta }) => meta),
     finalsSinceProfile,
@@ -25,6 +37,8 @@ export const GET = route(async (_req: Request, { params }: P) => {
 const Update = z.object({
   name: z.string().trim().min(1).optional(),
   description: z.string().optional(),
+  audience: z.string().optional(),
+  platform: z.string().optional(),
   palette: z.array(PaletteColor).optional(),
   rules: HardRules.optional(),
 });
