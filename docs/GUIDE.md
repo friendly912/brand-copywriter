@@ -256,6 +256,7 @@ To move to a new computer, install the app there, then copy your `data` folder i
 | Emails don't sound like the brand | Add more (and better) past emails, star the best, add results, then **Refresh with AI** on the Voice profile tab. Try **Effort: High** in Settings. |
 | A screenshot or PDF came out with mistakes | Open it in the list, click **View → Edit**, and correct the text. |
 | Something is broken after updating | Double-click **`rebuild.bat`**, then **`start.bat`**. |
+| *"os error 32"*, *"being used by another process"* or *"failed to rename file"* during the first start or a rebuild | Another program has the app's files open. Close **all** Brand Copywriter black windows, then run **`rebuild.bat`**. If the folder is inside **OneDrive or Dropbox**, move it out first (for example to `C:\BrandCopywriter`). Still failing? Restart the computer and run `rebuild.bat` again. |
 
 Still stuck? Take a screenshot of the black window and the browser, and send them to whoever set the app up for you.
 

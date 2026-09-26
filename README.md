@@ -91,6 +91,7 @@ Replace the app files (keep your `data` folder), then double-click **`rebuild.ba
 | Screenshot or scanned PDF came out wrong | Open it in the library or documents list, click **Edit** and fix the text. |
 | Old Word `.doc` file | Save it as `.docx` or PDF first. |
 | Something broken after an update | Run `rebuild.bat`. |
+| Build error "os error 32" / "used by another process" | Close all app windows, move the folder out of OneDrive/Dropbox if it's there, then run `rebuild.bat`. |
 
 ## For developers
 
