@@ -1,0 +1,51 @@
+{
+  "summary": "Luna & Fern writes like its founder Mia talks: a warm, unhurried friend who knows a lot about skin. Emails are calm, honest and specific, with gentle humour and zero pressure, and every claim is about how a product feels or what it does, never about fixing flaws.",
+  "personality": ["warm", "calm", "honest", "gently playful", "personal", "unhurried"],
+  "audience": "US women 25–45 with sensitive or reactive skin who want a simple, kind routine and distrust hype.",
+  "tone_by_email_type": [
+    { "email_type": "promo", "tone": "Relaxed and generous; the discount is mentioned plainly, urgency is soft and factual (\"ends Sunday at midnight\")." },
+    { "email_type": "welcome", "tone": "Personal origin story from Mia, reassuring, with a small no-rush gift." },
+    { "email_type": "abandoned_cart", "tone": "No pressure; answers the likely questions and offers to talk." },
+    { "email_type": "newsletter", "tone": "Chatty studio diary with small confessions and Q&A." },
+    { "email_type": "product_launch", "tone": "Quietly proud; tells the making-of story, then the benefits." },
+    { "email_type": "win_back", "tone": "Missed-you warmth, a gift, and an honest invitation to say why they left." }
+  ],
+  "vocabulary": {
+    "signature_phrases": ["Hi love,", "No pressure at all", "No code, no fuss.", "Love, Mia", "I read every email.", "soft, never squeaky", "Promise."],
+    "preferred_words": ["ritual", "gentle", "calm", "soft", "lovely", "slow", "small batch", "your skin"],
+    "avoid_words": ["anti-aging", "flawless", "miracle", "cheap", "perfect skin", "flaws", "fix", "hurry", "act now"]
+  },
+  "mechanics": {
+    "sentence_length": "Short to medium sentences (8–18 words), with the occasional two-word fragment for rhythm (\"Promise.\").",
+    "person": "First person singular from Mia (\"I\"), \"we\" for the studio, always addressing \"you\".",
+    "capitalization": "Sentence case everywhere, including subject lines and headlines.",
+    "punctuation": "Em dashes are common. At most one exclamation point per email and never in subject lines.",
+    "emoji": "Almost never. At most a single 🌿 in newsletters; none in promos.",
+    "formatting": "One-to-three-sentence paragraphs, short product lists as 'Name — benefit', a single soft button."
+  },
+  "subject_lines": {
+    "patterns": ["Gentle invitation or small promise", "Soft curiosity (\"Still thinking it over?\")", "Warm metaphor tied to the product (\"your skin's new bedtime story\")"],
+    "typical_length": "25–45 characters, sentence case, no emoji or exclamation points",
+    "examples": ["Your summer ritual, now 20% lighter", "Still thinking it over?", "We saved you a seat", "Meet Night Balm, your skin's new bedtime story"]
+  },
+  "preview_text": {
+    "patterns": ["Adds the concrete detail the subject withholds (dates, no code needed)", "Reassurance or a hint of what's inside"],
+    "examples": ["Our bestsellers are on quiet sale until Sunday — no code needed.", "It's been a while. Here's what's new, and a little something to welcome you back."]
+  },
+  "structure": {
+    "default": ["Hi love greeting", "short personal opener", "main message", "short list or Q&A", "single soft CTA", "Love, Mia sign-off", "optional P.S. inviting a reply"],
+    "by_email_type": [
+      { "email_type": "promo", "sections": ["mood-setting opener", "offer in plain words", "three-product list with benefits", "no-code reassurance", "CTA", "soft deadline", "P.S. invite to reply"] },
+      { "email_type": "product_launch", "sections": ["making-of story", "what it feels like", "benefit bullets", "price and how long it lasts", "CTA"] },
+      { "email_type": "abandoned_cart", "sections": ["no-pressure opener", "FAQ-style reassurance", "CTA", "offer to talk"] }
+    ]
+  },
+  "cta_style": {
+    "patterns": ["Three or four words, soft and specific", "Often uses 'ritual' or names the benefit"],
+    "examples": ["Build your ritual", "Find your first ritual", "Say goodnight to dry skin", "Return to my cart", "See what's new"]
+  },
+  "sign_off": "Love, Mia (sometimes followed by 'Founder, Luna & Fern')",
+  "dos": ["Describe how products feel on the skin", "Give prices plainly ($36)", "Offer a reply-to-me invitation", "Keep urgency factual and calm", "Mention fragrance-free / sensitive-skin testing when relevant"],
+  "donts": ["Promise to erase, reverse or fix anything", "Use ALL CAPS, countdown panic or 'LAST CHANCE'", "Use exclamation points in subject lines", "Say 'Buy now' or 'Shop now'", "Use clinical jargon without explaining it"],
+  "open_questions": []
+}

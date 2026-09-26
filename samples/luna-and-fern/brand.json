@@ -1,0 +1,68 @@
+{
+  "id": "luna-and-fern",
+  "name": "Luna & Fern",
+  "description": "Small-batch, fragrance-free skincare for sensitive skin, made in Portland. Founder-led; emails come from Mia.",
+  "audience": "US women 25–45 with sensitive or reactive skin who prefer simple routines",
+  "platform": "Klaviyo",
+  "palette": [
+    { "name": "Fern", "hex": "#4F6F52", "role": "primary" },
+    { "name": "Moon", "hex": "#F5F1E8", "role": "background" },
+    { "name": "Clay", "hex": "#C97B63", "role": "cta" },
+    { "name": "Ink", "hex": "#2B2B2B", "role": "text" }
+  ],
+  "rules": {
+    "bannedWords": ["anti-aging", "flawless", "miracle", "cheap", "hurry", "act now"],
+    "emoji": "sparingly",
+    "signOff": "Love, Mia",
+    "subjectMaxChars": 45,
+    "previewMinChars": 40,
+    "previewMaxChars": 100,
+    "other": ["No exclamation points in subject lines", "Sentence case for subject lines and headlines"]
+  },
+  "emails": [
+    { "file": "emails/01-summer-ritual-sale.txt", "type": "promo", "favorite": true, "note": "44% open, 5.8% CTR" },
+    { "file": "emails/02-welcome.html", "type": "welcome", "favorite": true, "note": "62% open, 11.2% CTR" },
+    { "file": "emails/03-abandoned-cart.txt", "type": "abandoned_cart", "note": "9.4% recovered carts" },
+    { "file": "emails/04-studio-notes.md", "type": "newsletter" },
+    { "file": "emails/05-night-balm-launch.eml", "type": "product_launch", "note": "Best launch email of 2026, $18k revenue" },
+    { "file": "emails/06-win-back.txt", "type": "win_back" }
+  ],
+  "docs": [
+    { "file": "docs/style-guide.pdf", "kind": "style_guide", "title": "Voice & tone guide" },
+    { "file": "docs/products.md", "kind": "product_info", "title": "Product sheet (autumn 2026)" }
+  ],
+  "briefs": [
+    {
+      "title": "Black Friday: 25% off sitewide",
+      "brief": {
+        "emailType": "seasonal",
+        "goal": "Drive Black Friday sales without sounding like every other Black Friday email",
+        "offer": "25% off everything, no code needed",
+        "deadline": "Friday to Monday midnight",
+        "targetCta": "Stock up gently",
+        "length": "short and scannable: body under 120 words",
+        "mustInclude": "Free shipping over $50"
+      }
+    },
+    {
+      "title": "Calm Mist launch",
+      "brief": {
+        "emailType": "product_launch",
+        "goal": "Announce Calm Mist and get first-week sales",
+        "products": "Calm Mist",
+        "offer": "Free Calm Mist mini with any order over $40 this week",
+        "targetCta": "Meet Calm Mist"
+      }
+    },
+    {
+      "title": "Welcome #2: how to build a routine",
+      "brief": {
+        "emailType": "welcome",
+        "goal": "Second email in the welcome flow: teach a simple 3-step routine and nudge a first purchase",
+        "products": "Cloud Cleanser, Dew Serum, Daylight SPF 40",
+        "mustInclude": "Remind them HELLOFERN expires in 10 days",
+        "length": "medium: body 120-250 words"
+      }
+    }
+  ]
+}

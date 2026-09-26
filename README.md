@@ -30,6 +30,10 @@ Claude is always tried first. OpenRouter is the next option: if a Claude request
 
 Port 3000 already in use? Open a command prompt in the folder and run `set PORT=3001 & start.bat`.
 
+## Try it with sample data
+
+Brands → **Load sample brands** imports three made-up brands with very different voices (a calm skincare founder, a blunt workwear maker and a pun-loving coffee roaster). Each comes with past emails and their results, a style guide, product info, a palette, rules, a ready-made voice profile and sample briefs. See [samples/README.md](samples/README.md) for what's included and what to test.
+
 ## Using it
 
 1. **Brands → New brand.** One per brand.
@@ -109,5 +113,6 @@ npm run typecheck
 | `lib/store.ts` | JSON file storage |
 | `app/api/**` | Local API routes |
 | `app/**/page.tsx`, `components/**` | UI |
+| `samples/`, `lib/samples.ts` | Sample brands for testing and their importer |
 
 See [docs/DESIGN.md](docs/DESIGN.md) for the design.

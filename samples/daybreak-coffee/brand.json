@@ -1,0 +1,66 @@
+{
+  "id": "daybreak-coffee",
+  "name": "Daybreak Coffee Co.",
+  "description": "Small-batch coffee roaster in Austin, Texas. Fresh-roasted beans shipped weekly, plus a subscription.",
+  "audience": "Coffee lovers 22–40 who want great coffee without the snobbery",
+  "platform": "Klaviyo",
+  "palette": [
+    { "name": "Espresso", "hex": "#3B2A20", "role": "text" },
+    { "name": "Crema", "hex": "#F3E3C3", "role": "background" },
+    { "name": "Sunrise", "hex": "#F28C28", "role": "cta" },
+    { "name": "Sky", "hex": "#8FB8DE", "role": "accent" }
+  ],
+  "rules": {
+    "bannedWords": ["terroir", "mouthfeel", "connoisseur"],
+    "emoji": "free",
+    "signOff": "stay caffeinated, the Daybreak crew",
+    "subjectMaxChars": 50,
+    "previewMinChars": 40,
+    "previewMaxChars": 100,
+    "other": ["lowercase subject lines and greetings; product names keep capitals"]
+  },
+  "emails": [
+    { "file": "emails/01-bogo-bags.txt", "type": "promo", "favorite": true, "note": "47% open, 7.9% CTR" },
+    { "file": "emails/02-welcome.txt", "type": "welcome", "favorite": true, "note": "68% open, 14% CTR" },
+    { "file": "emails/03-abandoned-cart.txt", "type": "abandoned_cart", "note": "12% recovered carts" },
+    { "file": "emails/04-the-daily-grind.md", "type": "newsletter" },
+    { "file": "emails/05-pumpkin-launch.html", "type": "product_launch", "note": "Sold out in 3 days" },
+    { "file": "emails/06-cupping-livestream.txt", "type": "event" }
+  ],
+  "docs": [
+    { "file": "docs/style-guide.md", "kind": "style_guide", "title": "Voice cheat sheet" },
+    { "file": "docs/products.md", "kind": "product_info", "title": "Current lineup" }
+  ],
+  "briefs": [
+    {
+      "title": "Subscription push: 10% off every bag",
+      "brief": {
+        "emailType": "promo",
+        "goal": "Convert one-time buyers into subscribers",
+        "offer": "Subscribe and get your first subscription bag free, plus 10% off every bag after",
+        "targetCta": "start my subscription",
+        "mustInclude": "skip or cancel anytime"
+      }
+    },
+    {
+      "title": "Holiday gift boxes",
+      "brief": {
+        "emailType": "seasonal",
+        "goal": "Sell holiday gift boxes",
+        "products": "Cupping Trio, Sunrise Blend, a Daybreak mug",
+        "deadline": "Order by December 15 for delivery before the holidays",
+        "toneNudge": "extra festive",
+        "length": "short and scannable: body under 120 words"
+      }
+    },
+    {
+      "title": "Win-back: we miss you",
+      "brief": {
+        "emailType": "win_back",
+        "goal": "Bring back customers who haven't ordered in 6 months",
+        "offer": "25% off with code MISSYOU25, valid 7 days",
+        "targetCta": "come back for coffee"
+      }
+    }
+  ]
+}

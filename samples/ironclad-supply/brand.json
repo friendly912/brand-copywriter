@@ -1,0 +1,66 @@
+{
+  "id": "ironclad-supply",
+  "name": "Ironclad Supply Co.",
+  "description": "Overbuilt workwear and outdoor gear made in Bend, Oregon since 2011. Lifetime repair program on everything.",
+  "audience": "Tradespeople, ranchers and outdoor people, mostly men 28–60, who buy once and buy right",
+  "platform": "Shopify Email",
+  "palette": [
+    { "name": "Iron", "hex": "#2F3437", "role": "primary" },
+    { "name": "Blaze", "hex": "#E4572E", "role": "cta" },
+    { "name": "Canvas", "hex": "#EDE6D6", "role": "background" },
+    { "name": "Moss", "hex": "#5B6B4E", "role": "accent" }
+  ],
+  "rules": {
+    "bannedWords": ["revolutionary", "game-changer", "luxury", "premium", "elevate", "must-have"],
+    "emoji": "never",
+    "signOff": "— The Ironclad crew",
+    "subjectMaxChars": 50,
+    "previewMinChars": 30,
+    "previewMaxChars": 90,
+    "other": ["Title Case for subject lines", "No exclamation points"]
+  },
+  "emails": [
+    { "file": "emails/01-field-day-sale.txt", "type": "promo", "favorite": true, "note": "38% open, 4.1% CTR, best sale email" },
+    { "file": "emails/02-welcome.txt", "type": "welcome", "note": "55% open, 8.7% CTR" },
+    { "file": "emails/03-abandoned-cart.txt", "type": "abandoned_cart", "favorite": true },
+    { "file": "emails/04-field-notes.html", "type": "newsletter", "note": "Highest reply rate of the year" },
+    { "file": "emails/05-ridge-jacket-launch.txt", "type": "product_launch" },
+    { "file": "emails/06-no-doorbusters.txt", "type": "seasonal", "favorite": true, "note": "Black Friday 2025: $62k revenue" }
+  ],
+  "docs": [
+    { "file": "docs/brand-voice.md", "kind": "style_guide", "title": "How we talk" },
+    { "file": "docs/products.docx", "kind": "product_info", "title": "Product catalogue 2026" }
+  ],
+  "briefs": [
+    {
+      "title": "Waxed Chore Coat launch",
+      "brief": {
+        "emailType": "product_launch",
+        "goal": "Launch the limited Waxed Chore Coat and sell through the first batch",
+        "products": "Waxed Chore Coat",
+        "deadline": "Only 400 made",
+        "targetCta": "Get the Waxed Coat",
+        "length": "short and scannable: body under 120 words"
+      }
+    },
+    {
+      "title": "Win-back: lifetime repair reminder",
+      "brief": {
+        "emailType": "win_back",
+        "goal": "Re-engage customers who haven't bought in 18 months by reminding them about free lifetime repairs",
+        "offer": "Free return shipping label for repairs this month",
+        "targetCta": "Start a Repair"
+      }
+    },
+    {
+      "title": "Father's Day gift guide",
+      "brief": {
+        "emailType": "seasonal",
+        "goal": "Gift guide for Father's Day",
+        "products": "Wool Watch Cap, Rancher Gloves, Haul Duffel",
+        "deadline": "Order by June 16 for delivery before Father's Day",
+        "mustInclude": "Free shipping over $100"
+      }
+    }
+  ]
+}

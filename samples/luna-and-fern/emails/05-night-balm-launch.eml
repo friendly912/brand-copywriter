@@ -1,0 +1,34 @@
+From: Mia at Luna & Fern <hello@lunaandfern.example>
+To: friend@example.com
+Subject: Meet Night Balm, your skin's new bedtime story
+Date: Tue, 04 Mar 2026 09:00:00 -0800
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="b1"
+
+--b1
+Content-Type: text/plain; charset=utf-8
+
+Plain text version.
+
+--b1
+Content-Type: text/html; charset=utf-8
+
+<html><body>
+<span class="preheader" style="display:none">Ceramides, oat and a whole lot of patience. Out today.</span>
+<h1>Meet Night Balm</h1>
+<p>Hi love,</p>
+<p>Eighteen months, thirteen rounds of testing and one very patient chemist later, Night Balm is finally here.</p>
+<p>It's the thing I wanted on my own nightstand: a rich, cushiony balm with ceramides and colloidal oat that melts in and stays put while you sleep. You wake up to skin that feels calm and cared for, not greasy.</p>
+<h2>Why you'll love it</h2>
+<ul>
+<li>Ceramides to help your skin hold on to moisture overnight</li>
+<li>Colloidal oat to soothe tight, dry patches</li>
+<li>No fragrance, no essential oils, nothing to sting</li>
+</ul>
+<p>It's $36, and it lasts about three months.</p>
+<p><a href="https://example.com/night-balm">Say goodnight to dry skin</a></p>
+<p>Love,<br>Mia</p>
+<p>Unsubscribe | View this email in your browser</p>
+</body></html>
+
+--b1--

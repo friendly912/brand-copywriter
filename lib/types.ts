@@ -31,6 +31,8 @@ export const Brand = z.object({
   palette: z.array(PaletteColor).default([]),
   rules: HardRules,
   activeProfileVersion: z.number().int().nullable().default(null),
+  /** Set when the brand was imported from the bundled sample data (see samples/). */
+  sampleId: z.string().nullable().default(null),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

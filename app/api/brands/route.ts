@@ -31,6 +31,7 @@ export const POST = route(async (req: Request) => {
     palette: [],
     rules: HardRules.parse({}),
     activeProfileVersion: null,
+    sampleId: null,
     createdAt: now(),
     updatedAt: now(),
   };

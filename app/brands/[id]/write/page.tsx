@@ -19,6 +19,7 @@ function WriteScreen() {
   const [brand, setBrand] = useState<Brand | null>(null);
   const [profile, setProfile] = useState<BrandProfile | null>(null);
   const [sourceCount, setSourceCount] = useState(0);
+  const [sampleBriefs, setSampleBriefs] = useState<{ title: string; brief: Brief }[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [brief, setBrief] = useState<Brief>(() => Brief.parse({ emailType: "promo" }));
   const [progress, setProgress] = useState<JobProgress | null>(null);
@@ -31,6 +32,11 @@ function WriteScreen() {
         setBrand(d.brand);
         setProfile(d.profile);
         setSourceCount(d.sources.length);
+        if (d.brand.sampleId) {
+          api<{ id: string; briefs: { title: string; brief: Brief }[] }[]>("/api/samples")
+            .then((all) => setSampleBriefs(all.find((x) => x.id === d.brand.sampleId)?.briefs ?? []))
+            .catch(() => {});
+        }
       })
       .catch((e) => setError(e.message));
   }, [brandId]);
@@ -105,6 +111,25 @@ function WriteScreen() {
 
       <div className="write">
         <aside className="brief card">
+          {sampleBriefs.length > 0 && !draft && (
+            <label className="field" style={{ marginBottom: 14 }}>
+              <span>Sample brief</span>
+              <select
+                value=""
+                onChange={(e) => {
+                  const picked = sampleBriefs[Number(e.target.value)];
+                  if (picked) setBrief(Brief.parse(picked.brief));
+                }}
+              >
+                <option value="">Fill the form with a sample brief…</option>
+                {sampleBriefs.map((b, i) => (
+                  <option key={i} value={i}>
+                    {b.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <BriefForm
             brief={brief}
             onChange={setBrief}

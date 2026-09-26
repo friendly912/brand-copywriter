@@ -1,0 +1,50 @@
+{
+  "summary": "Daybreak Coffee Co. sounds like your funniest friend who happens to be a coffee nerd: lowercase, pun-happy, emoji-rich and never snobby. Coffee is described by what it tastes like in plain words, and every email has a joke or two.",
+  "personality": ["playful", "punny", "friendly", "unpretentious", "enthusiastic", "self-aware"],
+  "audience": "Coffee lovers aged 22–40 who want great coffee without being lectured about it.",
+  "tone_by_email_type": [
+    { "email_type": "promo", "tone": "Excited and jokey, with the deal stated clearly in caps once (FREE) and a playful deadline." },
+    { "email_type": "welcome", "tone": "Club-membership framing, checklist of perks, self-deprecating pun apology." },
+    { "email_type": "abandoned_cart", "tone": "Teasing personification of the beans, a nudge about free shipping." },
+    { "email_type": "newsletter", "tone": "Magazine-style sections with emoji headers, farm story, brewing hack, office joke." },
+    { "email_type": "product_launch", "tone": "Hype-y but honest; plays on customer excitement, lists quirky facts." },
+    { "email_type": "event", "tone": "Inviting and explanatory; demystifies coffee jargon." }
+  ],
+  "vocabulary": {
+    "signature_phrases": ["hey sunshine ☀️", "stay caffeinated, the Daybreak crew", "zero coffee snobbery", "roasted on monday", "btw. just saying.", "we won't judge"],
+    "preferred_words": ["beans", "fresh", "good mornings", "roast", "tastes like", "sunshine", "crew"],
+    "avoid_words": ["terroir", "mouthfeel", "connoisseur", "complex notes", "artisanal"]
+  },
+  "mechanics": {
+    "sentence_length": "Short and conversational; mix of full sentences and quick asides in parentheses.",
+    "person": "\"we\" for the crew, \"you\" for the reader; occasionally names team members (Maya, Kevin the roaster).",
+    "capitalization": "lowercase subject lines, greetings and most body copy; product and people names keep capitals; one word in CAPS for emphasis.",
+    "punctuation": "Exclamation points allowed but never stacked; parentheses for jokes; colons before lists.",
+    "emoji": "Freely: one at the end of the subject line, as list bullets, and in section headers.",
+    "formatting": "Emoji-bulleted lists, short sections, one button, casual sign-off."
+  },
+  "subject_lines": {
+    "patterns": ["lowercase pun + one emoji at the end", "playful personification (\"your coffee is getting cold\")", "casual invitation"],
+    "typical_length": "25–45 characters, lowercase, ends with one emoji",
+    "examples": ["buy one bag, get one bean-efit 🎁", "your coffee is getting cold 🥶", "welcome to the good mornings club ☕", "come taste coffee with us (virtually) 👀"]
+  },
+  "preview_text": {
+    "patterns": ["Explains the pun or adds the offer detail", "A second, smaller joke"],
+    "examples": ["BOGO on every 12 oz bag this weekend. yes, even the fancy ones.", "well, technically it's still beans. but you get the idea."]
+  },
+  "structure": {
+    "default": ["casual greeting", "funny opener", "the news or offer", "emoji-bulleted list", "button", "deadline or btw line", "stay caffeinated sign-off", "optional p.s."],
+    "by_email_type": [
+      { "email_type": "promo", "sections": ["greeting", "relatable opener", "offer with one CAPS word", "our picks list", "button", "playful deadline"] },
+      { "email_type": "newsletter", "sections": ["title", "greeting", "farm story", "brewing hack", "fun team fact", "button"] }
+    ]
+  },
+  "cta_style": {
+    "patterns": ["lowercase, playful, 2–4 words, often personifies the beans"],
+    "examples": ["grab your beans", "find your roast", "rescue my beans", "save my spot", "get it before it's gone"]
+  },
+  "sign_off": "stay caffeinated, the Daybreak crew",
+  "dos": ["Include at least one pun", "Describe flavour in everyday words (tastes like berries)", "Use emoji bullets for lists", "Mention fresh roasting on Mondays when relevant", "Keep the tone inclusive: any way you drink coffee is fine"],
+  "donts": ["Sound snobby or use coffee jargon without explaining it", "Stack exclamation points", "Capitalise subject lines", "Stack three or more puns in one line"],
+  "open_questions": []
+}

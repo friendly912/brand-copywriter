@@ -42,7 +42,9 @@ export function isImage(fileName: string) {
 }
 
 export function htmlToCopy(html: string): { subject: string; preview: string; body: string } {
-  const title = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1]?.trim() ?? "";
+  // Decode entities (&amp; etc.) in the title the same way as the body.
+  const rawTitle = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? "";
+  const title = convert(rawTitle, { wordwrap: false }).replace(/\s+/g, " ").trim();
   // Preheaders are usually the first hidden element in the body.
   const pre =
     /<(?:div|span|p)[^>]*(?:class="[^"]*preheader[^"]*"|style="[^"]*display:\s*none[^"]*")[^>]*>([\s\S]*?)<\/(?:div|span|p)>/i.exec(html)?.[1] ??
@@ -61,7 +63,11 @@ export function htmlToCopy(html: string): { subject: string; preview: string; bo
       { selector: "h1", options: { uppercase: false } },
       { selector: "h2", options: { uppercase: false } },
       { selector: "h3", options: { uppercase: false } },
-      { selector: "table", format: "dataTable", options: { uppercaseHeaderCells: false } },
+      // Email HTML uses tables for layout, not data: treat every cell as a plain block
+      // (a data-table format would wrap text at 60 characters and pad columns).
+      { selector: "table", format: "block" },
+      { selector: "td", format: "block" },
+      { selector: "th", format: "block" },
       { selector: "[style*='display:none']", format: "skip" },
       { selector: "[style*='display: none']", format: "skip" },
       { selector: ".preheader", format: "skip" },
@@ -155,7 +161,7 @@ export async function docToText(fileName: string, data: Buffer): Promise<string>
     const { extractText, getDocumentProxy } = await import("unpdf");
     const pdf = await getDocumentProxy(new Uint8Array(data));
     const { text, totalPages } = await extractText(pdf, { mergePages: true });
-    const clean = tidy(text);
+    const clean = unwrapLines(tidy(text));
     // Almost no text per page means a scanned or image-only PDF: let Claude read it.
     if (clean.length >= 100 * Math.min(totalPages, 3)) return clean;
     const { text: read } = await runText({
@@ -195,6 +201,11 @@ export async function docToText(fileName: string, data: Buffer): Promise<string>
 
   if (ext === "doc") throw new Error("Old .doc files aren't supported. Save it as .docx or PDF and try again.");
   throw new Error(`Unsupported file type ".${ext}". Use PDF, .docx, .txt, .md, .html or an image.`);
+}
+
+/** PDF text keeps the page's line breaks; rejoin lines that were wrapped mid-sentence. */
+function unwrapLines(text: string): string {
+  return text.replace(/([^\n.!?:;])\n(?=[a-z(])/g, "$1 ");
 }
 
 function tidy(text: string): string {

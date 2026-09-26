@@ -1,0 +1,51 @@
+{
+  "summary": "Ironclad Supply Co. writes like the crew on its shop floor: blunt, dry and efficient. Specs, repair stories and one-line jokes do the selling; there is no hype, no emoji and no fake urgency.",
+  "personality": ["blunt", "dry humour", "confident, not boastful", "practical", "anti-hype", "respectful of the reader's time"],
+  "audience": "Tradespeople, ranchers and outdoor people who buy once and buy right, and distrust marketing.",
+  "tone_by_email_type": [
+    { "email_type": "promo", "tone": "Matter-of-fact: states the discount and the end date, explains why the sale exists, lists a few hero products with specs." },
+    { "email_type": "welcome", "tone": "Short origin story (garage in Bend, 2011), sets expectations, one code." },
+    { "email_type": "abandoned_cart", "tone": "Wry and brief; one line of product proof, offer of help from a real person." },
+    { "email_type": "newsletter", "tone": "Field story from a real customer, a shop-floor update and a practical tip." },
+    { "email_type": "product_launch", "tone": "What changed / what didn't, with hard specs and the price." },
+    { "email_type": "seasonal", "tone": "Contrarian: calls out the noise of big sale events and keeps it short." }
+  ],
+  "vocabulary": {
+    "signature_phrases": ["Buy once. Buy right.", "Built for the fourth winter, not the first.", "Breaks in, never breaks down.", "— The Ironclad crew", "No gimmicks.", "A real person on the shop floor will answer."],
+    "preferred_words": ["built", "outlast", "stitched", "canvas", "shop floor", "gear", "repair", "hard"],
+    "avoid_words": ["revolutionary", "game-changer", "luxury", "premium", "elevate", "must-have", "insane deal"]
+  },
+  "mechanics": {
+    "sentence_length": "Very short. Many sentences under 8 words; fragments are normal (\"Goatskin. Stitched twice.\").",
+    "person": "\"We\" for the company, \"you\" for the reader. No named individual sender.",
+    "capitalization": "Title Case subject lines. ALL CAPS only for short section labels inside the body (\"THE SHORT LIST\").",
+    "punctuation": "Full stops do the work. No exclamation points except in quotes mocking other brands. Em dashes in product lists.",
+    "emoji": "Never.",
+    "formatting": "Short paragraphs, ALL CAPS labels, product lists as 'Name — spec. One-liner.', one button."
+  },
+  "subject_lines": {
+    "patterns": ["Plain statement of what's happening", "Dry, slightly contrarian line", "Personified gear (\"Your Gloves Are Still on the Bench\")"],
+    "typical_length": "25–50 characters, Title Case",
+    "examples": ["Field Day Sale: 30% Off Everything We Make", "Your Gloves Are Still on the Bench", "We're Not Doing Doorbusters", "The New Ridge Jacket Is Here"]
+  },
+  "preview_text": {
+    "patterns": ["Short fragments that add the proof or the catch", "Deadpan follow-up to the subject"],
+    "examples": ["Three days. No gimmicks. Gear that outlasts the sale by about twenty years.", "We held them. Not forever, though."]
+  },
+  "structure": {
+    "default": ["one-line opener or ALL CAPS headline", "2–3 short paragraphs", "ALL CAPS labelled list with specs", "single button", "short closing line", "— The Ironclad crew"],
+    "by_email_type": [
+      { "email_type": "promo", "sections": ["headline", "offer and dates", "why we're doing it", "THE SHORT LIST", "button", "deadline line"] },
+      { "email_type": "product_launch", "sections": ["headline", "what we did", "WHAT CHANGED", "WHAT DIDN'T (incl. price)", "button", "tagline"] },
+      { "email_type": "newsletter", "sections": ["customer field story", "from the shop floor", "tip of the month", "link"] }
+    ]
+  },
+  "cta_style": {
+    "patterns": ["Two or three words, imperative, Title Case"],
+    "examples": ["Shop the Sale", "Gear Up", "Finish Your Order", "See the Ridge Jacket", "Shop 20% Off"]
+  },
+  "sign_off": "— The Ironclad crew",
+  "dos": ["Lead with specs and real use", "Mention the lifetime repair program when relevant", "Give exact end dates and times", "Keep jokes to one line", "State prices plainly"],
+  "donts": ["Use emoji or exclamation points", "Use hype words (revolutionary, premium, luxury)", "Invent scarcity or countdown panic", "Write paragraphs longer than three sentences"],
+  "open_questions": ["Should P.S. lines ever be used? None of the past emails have one."]
+}
