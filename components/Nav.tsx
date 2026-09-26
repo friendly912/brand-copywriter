@@ -34,6 +34,9 @@ export function Nav() {
           {link("/", "Brands")}
           {link("/history", "History")}
           {link("/settings", "Settings")}
+          <a href="/help" target="_blank" rel="noopener">
+            Help ↗
+          </a>
         </nav>
       </header>
       {keyMissing && path !== "/settings" && (

@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Copywriter Help</title>
+<meta name="description" content="Step-by-step guide to installing and using Brand Copywriter.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233b5bdb'/%3E%3Cpath d='M8 11h16v10H8z' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Cpath d='m8 11 8 6 8-6' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f6f5f2; --surface: #ffffff; --surface-2: #f0eee9; --border: #e2dfd8;
+    --text: #1f1d1a; --muted: #6b665d; --faint: #9a948a;
+    --accent: #3b5bdb; --accent-soft: #e7ecfd;
+    --ok: #2b8a3e; --ok-soft: #e6f4ea; --warn: #b35c00; --warn-soft: #fff1dc; --tip: #3b5bdb; --tip-soft: #e7ecfd;
+    --radius: 10px;
+    --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: "Cascadia Mono", Consolas, ui-monospace, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161514; --surface: #1f1e1c; --surface-2: #292826; --border: #34322f;
+      --text: #ecebe8; --muted: #a8a399; --faint: #7b766e;
+      --accent: #7b93ff; --accent-soft: #252c47;
+      --ok: #69db7c; --ok-soft: #1c2e21; --warn: #ffa94d; --warn-soft: #33260f; --tip: #7b93ff; --tip-soft: #252c47;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161514; --surface: #1f1e1c; --surface-2: #292826; --border: #34322f;
+    --text: #ecebe8; --muted: #a8a399; --faint: #7b766e;
+    --accent: #7b93ff; --accent-soft: #252c47;
+    --ok: #69db7c; --ok-soft: #1c2e21; --warn: #ffa94d; --warn-soft: #33260f; --tip: #7b93ff; --tip-soft: #252c47;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--font); }
+  a { color: var(--accent); }
+  h1, h2, h3 { line-height: 1.25; margin: 0; }
+  p { margin: 0 0 12px; }
+
+  /* Header */
+  .top { position: sticky; top: 0; z-index: 10; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .top-inner { max-width: 1180px; margin: 0 auto; padding: 0 20px; height: 56px; display: flex; align-items: center; gap: 12px; }
+  .logo { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; flex: none; }
+  .top-title { font-weight: 700; }
+  .top .spacer { flex: 1; }
+  .top a.open { text-decoration: none; font-weight: 600; font-size: 14px; background: var(--accent); color: #fff; padding: 7px 14px; border-radius: 8px; white-space: nowrap; }
+  .theme-btn { font: inherit; font-size: 13px; background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+
+  /* Layout */
+  .layout { max-width: 1180px; margin: 0 auto; padding: 28px 20px 80px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 40px; }
+  nav.toc { position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 100px); overflow: auto; }
+  nav.toc .label { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+  nav.toc li a { display: flex; gap: 10px; padding: 6px 10px; border-radius: 7px; color: var(--muted); text-decoration: none; font-size: 14.5px; }
+  nav.toc li a::before { counter-increment: toc; content: counter(toc); color: var(--faint); min-width: 16px; font-variant-numeric: tabular-nums; }
+  nav.toc li a:hover { background: var(--surface-2); color: var(--text); }
+  nav.toc li a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  main { min-width: 0; }
+
+  /* Hero */
+  .hero { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px 30px; margin-bottom: 36px; }
+  .hero h1 { font-size: 30px; margin-bottom: 8px; }
+  .hero p { color: var(--muted); font-size: 17px; max-width: 62ch; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .fact { background: var(--surface-2); border-radius: 99px; padding: 4px 12px; font-size: 13.5px; color: var(--muted); }
+  .fact b { color: var(--text); }
+
+  /* Sections */
+  section { margin-bottom: 48px; }
+  section > h2 { font-size: 24px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  section > h2 .num { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 16px; flex: none; }
+  h3 { font-size: 18px; margin: 26px 0 10px; }
+  .lead { color: var(--muted); }
+
+  /* Steps */
+  ol.steps { list-style: none; padding: 0; margin: 0 0 16px; counter-reset: step; }
+  ol.steps > li { position: relative; padding: 2px 0 14px 46px; }
+  ol.steps > li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); color: var(--accent); font-weight: 700; font-size: 14px; display: grid; place-items: center; }
+  ol.steps > li:not(:last-child)::after { content: ""; position: absolute; left: 14px; top: 34px; bottom: 2px; width: 2px; background: var(--border); }
+  ol.steps li p { margin-bottom: 6px; }
+
+  /* Callouts */
+  .callout { border-radius: var(--radius); padding: 12px 16px 12px 14px; margin: 12px 0 16px; display: grid; grid-template-columns: 26px 1fr; gap: 8px; font-size: 15px; }
+  .callout .ic { font-size: 17px; line-height: 1.4; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout.check { background: var(--ok-soft); }
+  .callout.check strong:first-child { color: var(--ok); }
+  .callout.warn { background: var(--warn-soft); }
+  .callout.warn strong:first-child { color: var(--warn); }
+  .callout.tip { background: var(--tip-soft); }
+  .callout.tip strong:first-child { color: var(--tip); }
+
+  /* UI element names, keys, code */
+  .ui { display: inline-block; font-size: .9em; font-weight: 600; padding: 0 7px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; background: var(--surface); white-space: nowrap; }
+  kbd { font-family: var(--mono); font-size: .85em; padding: 1px 6px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); }
+  code { font-family: var(--mono); font-size: .88em; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+  pre { font-family: var(--mono); font-size: 14px; background: var(--surface-2); padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+
+  /* Tables and cards */
+  .table-wrap { overflow-x: auto; margin: 8px 0 18px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface-2); font-size: 13px; color: var(--muted); font-weight: 650; }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { font-weight: 600; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 10px 0 18px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .card h4 { margin: 0 0 4px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  ul.clean { padding-left: 20px; margin: 6px 0 14px; }
+  ul.clean li { margin: 3px 0; }
+
+  details.faq { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin: 8px 0; }
+  details.faq summary { cursor: pointer; padding: 12px 16px; font-weight: 600; list-style: none; display: flex; gap: 10px; }
+  details.faq summary::before { content: "▸"; color: var(--faint); transition: transform .15s; }
+  details.faq[open] summary::before { transform: rotate(90deg); }
+  details.faq > div { padding: 0 16px 14px 36px; color: var(--text); }
+  .search { width: 100%; font: inherit; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); margin-bottom: 8px; }
+
+  footer { color: var(--faint); font-size: 13.5px; border-top: 1px solid var(--border); padding-top: 18px; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; padding: 16px 16px 60px; }
+    nav.toc { position: static; max-height: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+    .hero { padding: 20px; }
+    .hero h1 { font-size: 24px; }
+    .top-title { font-size: 15px; }
+    .theme-btn { display: none; }
+  }
+  @media print {
+    .top, nav.toc { display: none; }
+    .layout { display: block; padding: 0; }
+    body { background: #fff; color: #000; font-size: 12pt; }
+    section { break-inside: auto; }
+    details.faq > div { display: block; }
+    a { color: inherit; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <span class="logo" aria-hidden="true">✉</span>
+    <span class="top-title">Brand Copywriter Help</span>
+    <span class="spacer"></span>
+    <button class="theme-btn" id="themeBtn" type="button" title="Switch light / dark">◐ Theme</button>
+    <a class="open" href="http://127.0.0.1:3000" target="_blank" rel="noopener">Open the app ↗</a>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc" aria-label="Contents">
+    <div class="label">Contents</div>
+    <ol>
+      <li><a href="#what">What this app does</a></li>
+      <li><a href="#need">What you need</a></li>
+      <li><a href="#install">Install on Windows</a></li>
+      <li><a href="#keys">Get your API key</a></li>
+      <li><a href="#samples">Try the sample brands</a></li>
+      <li><a href="#first-email">Write your first email</a></li>
+      <li><a href="#own-brand">Set up your own brand</a></li>
+      <li><a href="#everyday">Everyday use</a></li>
+      <li><a href="#trouble">Troubleshooting</a></li>
+      <li><a href="#mac-linux">Mac and Linux</a></li>
+      <li><a href="#words">Words used here</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <h1>From zero to your first email</h1>
+      <p>This guide walks you through installing Brand Copywriter and writing your first email. You don't need any technical knowledge; just follow the steps in order.</p>
+      <div class="facts">
+        <span class="fact">⏱ <b>About 20 minutes</b> the first time</span>
+        <span class="fact">💻 <b>Windows 10 / 11</b> (Mac &amp; Linux too)</span>
+        <span class="fact">🔒 Your data stays <b>on your computer</b></span>
+      </div>
+    </div>
+
+    <!-- 1 -->
+    <section id="what">
+      <h2><span class="num">1</span>What this app does</h2>
+      <p>You give the app a brand's old emails. It learns how that brand writes. Then you describe a new email in a few lines, and it writes the whole thing in that brand's voice:</p>
+      <div class="cards">
+        <div class="card"><h4>✉️ 5 subject lines</h4><p>Each with its own preview text, all in the brand's style.</p></div>
+        <div class="card"><h4>📰 Headline &amp; body</h4><p>Split into sections you can edit or rewrite one at a time.</p></div>
+        <div class="card"><h4>👆 Button text</h4><p>The main "call to action", in the brand's usual wording.</p></div>
+        <div class="card"><h4>🎨 Design notes</h4><p>Hints for your designer, like which brand colour to use for the button.</p></div>
+      </div>
+      <p>You check it, change anything you like, copy it into your email platform (Klaviyo, Mailchimp and so on) and design it as usual.</p>
+      <div class="callout tip"><span class="ic">💡</span><div><p><strong>Runs on your computer.</strong> The app opens in your web browser, but your brands and emails are saved only on your own computer.</p></div></div>
+    </section>
+
+    <!-- 2 -->
+    <section id="need">
+      <h2><span class="num">2</span>What you need</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>You need</th><th>Why</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td>A Windows 10 or 11 computer</td><td>The app runs on it</td><td>—</td></tr>
+          <tr><td>Internet connection</td><td>To reach the AI service</td><td>—</td></tr>
+          <tr><td>Node.js</td><td>A free program the app needs to run</td><td>Free</td></tr>
+          <tr><td>A Claude API key</td><td>Lets the app use Claude, the AI that writes</td><td>Pay per use, about $0.05–0.15 per email</td></tr>
+          <tr><td>OpenRouter API key <span style="font-weight:400;color:var(--muted)">(optional)</span></td><td>Backup AI if Claude is ever unavailable</td><td>Pay per use</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout tip"><span class="ic">🔑</span><div><p><strong>What's an API key?</strong> A long password that lets the app use an AI service on your account. You create it once and paste it into the app.</p></div></div>
+    </section>
+
+    <!-- 3 -->
+    <section id="install">
+      <h2><span class="num">3</span>Install on Windows</h2>
+
+      <h3>Step 1: Install Node.js</h3>
+      <ol class="steps">
+        <li><p>Go to <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>.</p></li>
+        <li><p>Click the big button that says <span class="ui">LTS</span>. It's the stable version.</p></li>
+        <li><p>Open the downloaded file and click <span class="ui">Next</span> through the installer. Keep all the default options.</p></li>
+        <li><p>When it says <span class="ui">Finish</span>, you're done.</p></li>
+      </ol>
+      <div class="callout check"><span class="ic">✅</span><div>
+        <p><strong>Check:</strong> press the <kbd>Windows</kbd> key, type <code>cmd</code> and press <kbd>Enter</kbd>. In the black window, type <code>node -v</code> and press <kbd>Enter</kbd>. You should see a version number such as <code>v24.18.0</code>. Close the window.</p>
+        <p>If it says <em>"'node' is not recognized"</em>, restart your computer and try again.</p>
+      </div></div>
+
+      <h3>Step 2: Download the app</h3>
+      <ol class="steps">
+        <li><p>Go to <a href="https://github.com/friendly912/brand-copywriter" target="_blank" rel="noopener">github.com/friendly912/brand-copywriter</a>. If the page says <em>404</em>, the project is private: ask its owner to give you access, or to send you the ZIP file.</p></li>
+        <li><p>Click the green <span class="ui">Code</span> button, then <span class="ui">Download ZIP</span>.</p></li>
+        <li><p>Open your <b>Downloads</b> folder, <b>right-click</b> the ZIP file, choose <span class="ui">Extract All…</span> and click <span class="ui">Extract</span>.</p></li>
+        <li><p>Move the extracted folder somewhere easy to find, for example <code>C:\BrandCopywriter</code>.</p></li>
+      </ol>
+      <div class="callout warn"><span class="ic">⚠️</span><div>
+        <p><strong>Always extract the ZIP first.</strong> Don't run the app from inside the ZIP file.</p>
+        <p>Avoid folders synced by <b>OneDrive</b> or <b>Dropbox</b>: syncing can lock the app's files while it prepares itself.</p>
+      </div></div>
+
+      <h3>Step 3: Start the app</h3>
+      <ol class="steps">
+        <li><p>Open the app folder.</p></li>
+        <li><p>Double-click <code>start.bat</code>.</p></li>
+        <li><p>A black window opens. <b>The first time only</b>, it installs and prepares everything. This takes 1–3 minutes and shows a lot of text. That's normal.</p></li>
+        <li><p>When it's ready, your web browser opens the app by itself.</p></li>
+      </ol>
+      <div class="callout check"><span class="ic">✅</span><div><p><strong>Check:</strong> your browser shows <b>Brand Copywriter</b> with a <b>Brands</b> page, at the address <code>http://127.0.0.1:3000</code>.</p></div></div>
+      <div class="callout warn"><span class="ic">🛡️</span><div><p><strong>"Windows protected your PC"?</strong> Windows shows this for files downloaded from the internet. Click <span class="ui">More info</span>, then <span class="ui">Run anyway</span>.</p></div></div>
+      <div class="callout tip"><span class="ic">🟡</span><div><p><strong>Keep the black window open</strong> while you use the app. Closing it stops the app.</p></div></div>
+    </section>
+
+    <!-- 4 -->
+    <section id="keys">
+      <h2><span class="num">4</span>Get your API key</h2>
+
+      <h3>Claude key (required)</h3>
+      <ol class="steps">
+        <li><p>Go to <a href="https://platform.claude.com" target="_blank" rel="noopener">platform.claude.com</a> and create an account (or sign in).</p></li>
+        <li><p>Under <b>Billing</b>, add a payment method and some credit. $10–20 is plenty to start.</p></li>
+        <li><p>Go to <b>API keys</b> and click <span class="ui">Create key</span>. Name it something like <em>Brand Copywriter</em>.</p></li>
+        <li><p><b>Copy the key right away.</b> It starts with <code>sk-ant-</code> and is only shown once.</p></li>
+        <li><p>In the app, click <b>Settings</b> at the top. Paste the key into the <b>Claude API key</b> box and click <span class="ui">Save key</span>.</p></li>
+        <li><p>Click <span class="ui">Test connection</span>.</p></li>
+      </ol>
+      <div class="callout check"><span class="ic">✅</span><div><p><strong>Check:</strong> a green box says <b>Connected</b>.</p></div></div>
+      <div class="callout warn"><span class="ic">🔒</span><div><p><strong>Treat the key like a password.</strong> Don't share it or post it anywhere.</p></div></div>
+
+      <h3>OpenRouter key (optional backup)</h3>
+      <p class="lead">If Claude is ever down or busy, the app can automatically use another AI through OpenRouter instead.</p>
+      <ol class="steps">
+        <li><p>Create an account at <a href="https://openrouter.ai" target="_blank" rel="noopener">openrouter.ai</a>, add a little credit, and create a key under <b>Keys</b>.</p></li>
+        <li><p>In the app's <b>Settings</b>, find <b>OpenRouter (next option after Claude)</b>, paste the key and click <span class="ui">Save key</span>.</p></li>
+        <li><p>Click <span class="ui">Test OpenRouter</span>. You should see <b>Connected</b>. You can leave the model as it is.</p></li>
+      </ol>
+    </section>
+
+    <!-- 5 -->
+    <section id="samples">
+      <h2><span class="num">5</span>Try it with the sample brands</h2>
+      <p>The app comes with three made-up brands so you can try everything before setting up your own.</p>
+      <ol class="steps">
+        <li><p>Click <b>Brands</b> at the top.</p></li>
+        <li><p>Click <span class="ui">Load sample brands</span>.</p></li>
+        <li><p>Leave everything ticked and click <span class="ui">Import 3 sample brands</span>.</p></li>
+        <li><p>Click <span class="ui">Close</span>.</p></li>
+      </ol>
+      <div class="callout check"><span class="ic">✅</span><div><p><strong>Check:</strong> you see three brand cards: <b>Daybreak Coffee Co.</b>, <b>Ironclad Supply Co.</b> and <b>Luna &amp; Fern</b>.</p></div></div>
+      <div class="cards">
+        <div class="card"><h4>🌿 Luna &amp; Fern</h4><p>Skincare. Calm, gentle, signed by the founder.</p></div>
+        <div class="card"><h4>🔨 Ironclad Supply Co.</h4><p>Workwear. Short, blunt, dry humour, no emoji.</p></div>
+        <div class="card"><h4>☕ Daybreak Coffee Co.</h4><p>Coffee. Playful, lowercase, puns and emoji.</p></div>
+      </div>
+      <p>Because they sound so different, the samples make it easy to see the app writing in different voices.</p>
+    </section>
+
+    <!-- 6 -->
+    <section id="first-email">
+      <h2><span class="num">6</span>Write your first email</h2>
+
+      <h3>Fill in the brief</h3>
+      <ol class="steps">
+        <li><p>On the <b>Luna &amp; Fern</b> card, click <span class="ui">Write email</span>.</p></li>
+        <li><p>At the top left, open the <b>Sample brief</b> list and choose <b>Black Friday: 25% off sitewide</b>. The form fills itself in.</p>
+            <p class="lead">For your own emails you type in the fields yourself. Every field is optional, but the more you give, the better the email.</p></li>
+        <li><p>Click <span class="ui">Write email</span>. A progress bar shows what's happening; a full email takes <b>20–60 seconds</b>.</p></li>
+      </ol>
+      <div class="callout check"><span class="ic">✅</span><div><p><strong>Check:</strong> the right side shows the finished email in blocks: <b>Subject lines &amp; preview text</b>, <b>Headline</b>, body sections, <b>CTA &amp; closing</b> and <b>Design notes</b>.</p></div></div>
+
+      <h3>Make it yours</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>To do this</th><th>Do this</th></tr></thead>
+        <tbody>
+          <tr><td>Pick a subject line</td><td>Click the round button next to the one you like.</td></tr>
+          <tr><td>Change any text</td><td>Click in the box and type. Changes save automatically.</td></tr>
+          <tr><td>Rewrite one part</td><td>Click <span class="ui">↻ Rewrite</span> on that block. Optionally type what you want ("shorter", "more fun") or click a suggestion.</td></tr>
+          <tr><td>Keep a part you like</td><td>Click <span class="ui">Lock</span> on that block. Locked parts never change.</td></tr>
+          <tr><td>Rewrite everything else</td><td>Click <span class="ui">Rewrite whole email (keeps locked)</span> on the left.</td></tr>
+          <tr><td>Get an AI second opinion</td><td>Click <span class="ui">✦ Review &amp; improve</span>. It checks the email and fixes only what needs fixing.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout warn"><span class="ic">🟠</span><div><p><strong>A coloured box above the email</strong> points out things to check, such as a word the brand never uses, a subject line that's too long, or a <code>[placeholder]</code> to fill in. Click <span class="ui">Fix with AI</span> or edit the text yourself.</p></div></div>
+      <div class="callout tip"><span class="ic">💡</span><div><p><strong>What's a [placeholder]?</strong> When the AI needs a fact you didn't give (a discount code, a date), it writes something like <code>[discount code]</code> instead of making one up. Replace it with the real thing.</p></div></div>
+
+      <h3>Copy it into your email platform</h3>
+      <ol class="steps">
+        <li><p>Click <span class="ui">Copy text</span> (or <span class="ui">Copy Markdown</span> if your tool supports it).</p></li>
+        <li><p>Paste into Klaviyo, Mailchimp, a Google Doc, or wherever you build emails.</p></li>
+      </ol>
+
+      <h3>Mark it as final</h3>
+      <p>When you've sent the email, click <span class="ui">✓ Mark final</span>. The app saves it as a new example of the brand's voice, and it learns from the changes you made.</p>
+    </section>
+
+    <!-- 7 -->
+    <section id="own-brand">
+      <h2><span class="num">7</span>Set up your own brand</h2>
+
+      <h3>Gather your materials first</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>What</th><th>How many</th><th>Where to get it</th></tr></thead>
+        <tbody>
+          <tr><td>Past emails</td><td>5–10 or more; mix types (sales, welcome, newsletters…)</td><td>See "How to save an email" below</td></tr>
+          <tr><td>Results <span style="font-weight:400;color:var(--muted)">(optional)</span></td><td>For your best emails</td><td>Open or click rates from your email platform, e.g. "32% CTR"</td></tr>
+          <tr><td>Style guide <span style="font-weight:400;color:var(--muted)">(optional)</span></td><td>Any</td><td>A PDF, Word file or text describing the brand voice</td></tr>
+          <tr><td>Product info <span style="font-weight:400;color:var(--muted)">(optional)</span></td><td>Any</td><td>Product names, prices, key features</td></tr>
+          <tr><td>Brand colours</td><td>3–6</td><td>Colour codes like <code>#C97B63</code> from your brand guide</td></tr>
+          <tr><td>Rules</td><td>—</td><td>Words to never use, emoji or not, how emails are signed off</td></tr>
+        </tbody>
+      </table></div>
+
+      <p><b>How to save an email</b> (any of these works):</p>
+      <ul class="clean">
+        <li><b>Copy and paste</b> the text. You can start with <code>Subject: …</code> and <code>Preview: …</code> lines.</li>
+        <li><b>Save as a web page:</b> open the email in your browser (its "View in browser" link), press <kbd>Ctrl</kbd> + <kbd>S</kbd>, and save it as an <code>.html</code> file.</li>
+        <li><b>Screenshot</b> the email and save it as a <code>.png</code> or <code>.jpg</code> file.</li>
+        <li><b>.eml files</b> exported from your email program also work.</li>
+      </ul>
+
+      <h3>Create the brand</h3>
+      <ol class="steps">
+        <li><p>Click <b>Brands</b>, then <span class="ui">+ New brand</span>. Type the name and a line about what the brand sells, then click <span class="ui">Create brand</span>.</p></li>
+        <li><p><b>Tab 1. Past emails:</b> drag your email files into the box (or paste text), choose the <b>Email type</b> (or leave <b>Auto-detect</b>), and click <span class="ui">Add</span>. Star ☆ your best emails. To add results, click <span class="ui">View</span> then <span class="ui">Edit</span> on an email and fill in <b>How it performed</b> (e.g. "44% open, 5.8% CTR").</p></li>
+        <li><p><b>Tab 2. Brand documents</b> <span class="lead">(optional)</span>: drop in your style guide and product info.</p></li>
+        <li><p><b>Tab 3. Voice profile:</b> click <span class="ui">Build voice profile</span> and wait about a minute. Read what the AI wrote about your brand's voice. If something is off, click <span class="ui">Edit</span> and fix it. If you see <b>Open questions for you</b>, answer them by editing the profile.</p></li>
+        <li><p><b>Tab 4. Rules &amp; palette:</b> add your audience, email platform, colours, banned words, emoji rule and sign-off, then click <span class="ui">Save</span>.</p></li>
+        <li><p>Click <span class="ui">Write an email</span>. You're ready.</p></li>
+      </ol>
+      <div class="callout tip"><span class="ic">💡</span><div><p><strong>The more good examples, the better.</strong> If the emails don't sound right yet, add more past emails, star the best ones, then go to <b>Voice profile</b> and click <span class="ui">Refresh with AI</span>.</p></div></div>
+    </section>
+
+    <!-- 8 -->
+    <section id="everyday">
+      <h2><span class="num">8</span>Everyday use</h2>
+      <div class="cards">
+        <div class="card"><h4>▶️ Start</h4><p>Double-click <code>start.bat</code>. The browser opens by itself.</p></div>
+        <div class="card"><h4>⏹ Stop</h4><p>Close the black window.</p></div>
+        <div class="card"><h4>🔎 Lost the tab?</h4><p>Go to <code>http://127.0.0.1:3000</code> while the black window is open.</p></div>
+        <div class="card"><h4>🗂 Old emails</h4><p>Click <b>History</b>. Search, filter by brand, click to reopen.</p></div>
+      </div>
+
+      <h3>Back up your work</h3>
+      <p>Everything is stored in the <code>data</code> folder inside the app folder. To back up, <b>copy the <code>data</code> folder</b> somewhere safe, such as a USB stick or cloud drive. To move to a new computer, install the app there and copy your <code>data</code> folder into it.</p>
+
+      <h3>Update to a new version</h3>
+      <ol class="steps">
+        <li><p>Close the app's black window.</p></li>
+        <li><p>Download and extract the new version (see <a href="#install">Step 2</a>).</p></li>
+        <li><p>Copy the <code>data</code> folder from your old app folder into the new one.</p></li>
+        <li><p>Double-click <code>rebuild.bat</code> in the new folder once, and wait for <b>Done</b>.</p></li>
+        <li><p>From then on, use <code>start.bat</code> in the new folder as usual.</p></li>
+      </ol>
+
+      <h3>Keep an eye on costs</h3>
+      <p><b>Settings → Spend</b> shows an estimate of this month's cost. To spend less, change these in <b>Settings → Writing</b>:</p>
+      <ul class="clean">
+        <li><b>Model:</b> <em>Claude Sonnet 5</em> costs about half as much as <em>Claude Opus 5</em>.</li>
+        <li><b>Effort:</b> <em>Low</em> is cheaper and faster; <em>High</em> is more careful.</li>
+        <li>Leave <b>Review every new email automatically</b> off. It roughly doubles the cost per email, so use <span class="ui">✦ Review &amp; improve</span> only when you want it.</li>
+      </ul>
+    </section>
+
+    <!-- 9 -->
+    <section id="trouble">
+      <h2><span class="num">9</span>Troubleshooting</h2>
+      <input class="search" id="faqSearch" type="search" placeholder="Type a word from the error, e.g. port, key, error 32…" aria-label="Search problems">
+      <div id="faqs">
+        <details class="faq"><summary>"Node.js is not installed" when starting</summary><div><p>Install Node.js (<a href="#install">Step 1</a>), restart the computer, and try again.</p></div></details>
+        <details class="faq"><summary>"Windows protected your PC"</summary><div><p>Click <span class="ui">More info</span>, then <span class="ui">Run anyway</span>.</p></div></details>
+        <details class="faq"><summary>The black window closes straight away</summary><div><p>Make sure you extracted the ZIP first (<a href="#install">Step 2</a>) and aren't running <code>start.bat</code> from inside it. Check Node.js is installed (Step 1).</p></div></details>
+        <details class="faq"><summary>Browser says "This site can't be reached"</summary><div><p>Wait 10 seconds and refresh. Make sure the black window is still open.</p></div></details>
+        <details class="faq"><summary>Error mentioning port 3000 or EADDRINUSE</summary><div><p>The app is probably already running in another black window. Use that one, or close it and start again. If that doesn't help, restart the computer.</p></div></details>
+        <details class="faq"><summary>"os error 32", "being used by another process" or "failed to rename file"</summary><div><p>Another program has the app's files open. Close <b>all</b> Brand Copywriter black windows, then run <code>rebuild.bat</code>. If the folder is inside <b>OneDrive or Dropbox</b>, move it out first (for example to <code>C:\BrandCopywriter</code>). Still failing? Restart the computer and run <code>rebuild.bat</code> again.</p></div></details>
+        <details class="faq"><summary>Yellow bar: "No API key yet"</summary><div><p>Add your key in <b>Settings</b> (see <a href="#keys">section 4</a>).</p></div></details>
+        <details class="faq"><summary>"The Claude API key was rejected"</summary><div><p>Copy the key again from platform.claude.com and save it again. Check that your account has credit.</p></div></details>
+        <details class="faq"><summary>"Rate limited"</summary><div><p>Wait a minute and try again, or add an OpenRouter key as a backup.</p></div></details>
+        <details class="faq"><summary>"The OpenRouter account is out of credits"</summary><div><p>Add credit on openrouter.ai.</p></div></details>
+        <details class="faq"><summary>Emails don't sound like the brand</summary><div><p>Add more (and better) past emails, star the best ones, add results, then click <span class="ui">Refresh with AI</span> on the Voice profile tab. You can also try <b>Effort: High</b> in Settings.</p></div></details>
+        <details class="faq"><summary>A screenshot or PDF came out with mistakes</summary><div><p>Open it in the list, click <span class="ui">View</span> then <span class="ui">Edit</span>, and correct the text.</p></div></details>
+        <details class="faq"><summary>Something is broken after updating</summary><div><p>Double-click <code>rebuild.bat</code>, then <code>start.bat</code>.</p></div></details>
+      </div>
+      <p id="noFaq" class="lead" hidden>No matching problem. Try another word, or clear the search box.</p>
+      <p class="lead" style="margin-top:14px">Still stuck? Take a screenshot of the black window and the browser, and send them to whoever set the app up for you.</p>
+    </section>
+
+    <!-- 10 -->
+    <section id="mac-linux">
+      <h2><span class="num">10</span>Mac and Linux</h2>
+      <p>The app works the same way, but you start it from the <b>Terminal</b> instead of <code>start.bat</code>.</p>
+      <ol class="steps">
+        <li><p>Install Node.js LTS from <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a> (Linux users can use their package manager).</p></li>
+        <li><p>Download and extract the app (<a href="#install">Step 2</a>).</p></li>
+        <li><p>Open <b>Terminal</b> in the app folder and run these, one at a time (first time only):</p>
+            <pre>npm install
+npm run build</pre></li>
+        <li><p>Start the app:</p><pre>npm start</pre></li>
+        <li><p>Open <code>http://127.0.0.1:3000</code> in your browser. Keep the Terminal open; press <kbd>Ctrl</kbd> + <kbd>C</kbd> in it to stop the app.</p></li>
+      </ol>
+      <p class="lead">After an update, run <code>npm install</code> and <code>npm run build</code> again.</p>
+    </section>
+
+    <!-- 11 -->
+    <section id="words">
+      <h2><span class="num">11</span>Words used here</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Word</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>API key</td><td>A private password that lets the app use an AI service and bill your account.</td></tr>
+          <tr><td>Brief</td><td>Your short description of the email you want: the goal, offer, products, deadline.</td></tr>
+          <tr><td>CTA</td><td>"Call to action": the main button, e.g. <em>Shop the sale</em>.</td></tr>
+          <tr><td>Preview text</td><td>The grey line shown after the subject in most inboxes. Also called pre-header or pretext.</td></tr>
+          <tr><td>Voice profile</td><td>The app's written description of how a brand writes. It's built from your past emails and documents, and you can edit it.</td></tr>
+          <tr><td>Lock</td><td>Protects a block so rewrites don't change it.</td></tr>
+          <tr><td>Final</td><td>An email you've marked as done. It becomes a new example for the brand.</td></tr>
+          <tr><td>OpenRouter</td><td>A service that gives access to many AI models; used as a backup.</td></tr>
+          <tr><td>Terminal / black window</td><td>A text window where programs show their messages. The app's window must stay open while you use it.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <footer>Brand Copywriter · This help page works offline: open <code>HELP.html</code> from the app folder, or click <b>Help</b> inside the app.</footer>
+  </main>
+</div>
+
+<script>
+  // Light / dark switch (remembered in this browser when possible).
+  (function () {
+    const root = document.documentElement;
+    let saved = null;
+    try { saved = localStorage.getItem("bc-help-theme"); } catch (e) {}
+    if (saved === "light" || saved === "dark") root.dataset.theme = saved;
+    document.getElementById("themeBtn").addEventListener("click", function () {
+      const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      root.dataset.theme = dark ? "light" : "dark";
+      try { localStorage.setItem("bc-help-theme", root.dataset.theme); } catch (e) {}
+    });
+  })();
+
+  // Highlight the section you're reading in the contents.
+  (function () {
+    const links = Array.from(document.querySelectorAll("nav.toc a"));
+    const byId = new Map(links.map((a) => [a.getAttribute("href").slice(1), a]));
+    const obs = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach((a) => a.classList.remove("active"));
+        const a = byId.get(e.target.id);
+        if (a) a.classList.add("active");
+      }
+    }, { rootMargin: "-80px 0px -65% 0px" });
+    document.querySelectorAll("main section[id]").forEach((s) => obs.observe(s));
+  })();
+
+  // Filter the troubleshooting list as you type.
+  (function () {
+    const input = document.getElementById("faqSearch");
+    const items = Array.from(document.querySelectorAll("#faqs details"));
+    const none = document.getElementById("noFaq");
+    input.addEventListener("input", function () {
+      const q = input.value.trim().toLowerCase();
+      let shown = 0;
+      items.forEach((d) => {
+        const hit = !q || d.textContent.toLowerCase().includes(q);
+        d.hidden = !hit;
+        d.open = !!q && hit;
+        if (hit) shown++;
+      });
+      none.hidden = shown > 0;
+    });
+  })();
+
+  // Print everything expanded.
+  window.addEventListener("beforeprint", () => document.querySelectorAll("details.faq").forEach((d) => (d.open = true)));
+</script>
+</body>
+</html>

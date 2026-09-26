@@ -2,7 +2,7 @@
 
 Writes marketing email copy in each brand's own voice. You give it a brand's past emails, it learns the voice, and then turns a short brief into a full email: 5 subject lines with preview text, headline, body sections, CTA, P.S. and design notes. You edit, copy it out, and design it yourself.
 
-**New here? Follow the step-by-step [Beginner's Guide](docs/GUIDE.md).**
+**New here? Follow the step-by-step [Beginner's Guide](docs/GUIDE.md).** The same guide comes as a web page, [HELP.html](HELP.html): double-click it in the app folder (works offline), or click **Help** in the app.
 
 Runs entirely on your Windows PC. The only thing that leaves your computer is the text sent to the AI service when writing (Claude, or OpenRouter as a backup).
 

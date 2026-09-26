@@ -1,5 +1,7 @@
 # Brand Copywriter: Beginner's Guide
 
+> This guide is also available as a web page: double-click **`HELP.html`** in the app folder, or click **Help** in the app's top menu.
+
 This guide takes you from nothing installed to your first finished email. You don't need any technical knowledge; just follow the steps in order.
 
 **Time needed:** about 20 minutes the first time.
