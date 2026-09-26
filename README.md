@@ -1,0 +1,96 @@
+# Brand Copywriter
+
+Writes marketing email copy in each brand's own voice. You give it a brand's past emails, it learns the voice, and then turns a short brief into a full email: 5 subject lines with preview text, headline, body sections, CTA, P.S. and design notes. You edit, copy it out, and design it yourself.
+
+Runs entirely on your Windows PC. The only thing that leaves your computer is the text sent to the Claude API when writing.
+
+## Requirements
+
+- Windows 10 or 11
+- [Node.js](https://nodejs.org) 20.9 or newer (the LTS installer, default options)
+- A Claude API key from [platform.claude.com](https://platform.claude.com/settings/keys)
+
+## Start it
+
+1. Unzip or copy this folder anywhere, e.g. `C:\BrandCopywriter`.
+2. Double-click **`start.bat`**.
+   The first run installs and builds the app (1–3 minutes). Later runs start in seconds.
+3. Your browser opens at http://127.0.0.1:3000. Keep the black window open while you work; close it to stop the app.
+4. Go to **Settings**, paste your API key and click **Test connection**.
+
+Port 3000 already in use? Open a command prompt in the folder and run `set PORT=3001 & start.bat`.
+
+## Using it
+
+1. **Brands → New brand.** One per brand.
+2. **Past emails.** Add 5–10 or more: drop exported `.html` or `.eml` files or screenshots, or paste the copy. Star the most on-voice ones as favourites.
+3. **Voice profile → Build voice profile.** Claude reads the emails and writes down how the brand writes. Read it, answer the "open questions", and edit anything that's off. Every save is a new version you can roll back to.
+4. **Rules & palette.** Banned words, emoji rule, sign-off, subject/preview length limits, brand colours. Drafts are checked against these automatically.
+5. **Write an email.** Fill in the brief (every field is optional) and click **Write email**.
+   - Pick a subject line with the radio button; edit anything in place (it autosaves).
+   - **↻ Rewrite** any block, optionally with an instruction ("more urgent", "shorter").
+   - **Lock** blocks you like; **Rewrite whole email** keeps locked blocks.
+   - The warning box flags banned words, over-long subjects and `[placeholders]` to fill in.
+   - **Copy text** / **Copy Markdown** copies the whole email with your chosen subject.
+6. **Mark final** when you've sent it. It becomes an example for that brand, and your edits are remembered. After a few finals, **Refresh with AI** on the profile page to fold what you changed back into the voice.
+
+## Your data
+
+Everything is stored as plain JSON files in the `data` folder next to `start.bat`:
+
+```
+data\settings.json          API key and preferences
+data\brands\                one file per brand (palette, rules)
+data\sources\<brand>\       past emails
+data\profiles\<brand>\      voice profile versions
+data\drafts\                every email written
+data\uploads\<brand>\       original uploaded files
+```
+
+**Back up** by copying the `data` folder. To move to another PC, copy the whole app folder, or just `data` into a fresh copy. To keep data somewhere else, set the `BC_DATA_DIR` environment variable to a folder path.
+
+The API key is stored in `data\settings.json` on this PC only. You can instead put `ANTHROPIC_API_KEY=...` in a `.env.local` file in this folder.
+
+## Cost
+
+You pay Anthropic directly for API usage. With Claude Opus 5 a full email is roughly $0.05–0.15, and a single block rewrite a cent or two. Settings shows an estimate of this month's spend. Switching to Claude Sonnet 5 in Settings is roughly half the price. Higher **Effort** is slower and costs more.
+
+## Updating
+
+Replace the app files (keep your `data` folder), then double-click **`rebuild.bat`** once, then `start.bat` as usual.
+
+## Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| "Node.js is not installed" | Install the LTS from nodejs.org, then close and reopen the window. |
+| Browser shows "can't connect" | Wait a few seconds after the window says it's running, then refresh. |
+| "The Claude API key was rejected" | Paste the key again in Settings; check the key is active in the Claude Console. |
+| "Rate limited" | Wait a minute and retry. |
+| Screenshot came out wrong | Open the email in the library, click **Edit text** and fix it. |
+| Something broken after an update | Run `rebuild.bat`. |
+
+## For developers
+
+Next.js 16 (App Router) + TypeScript, Anthropic TypeScript SDK, Zod. No database: `lib/store.ts` is a small JSON file store.
+
+```
+npm install
+npm run dev        # http://127.0.0.1:3000 with hot reload
+npm run typecheck
+```
+
+| Path | What |
+|---|---|
+| `lib/ai/prompts.ts` | All prompts (writing, rewriting, profile extraction, ingestion) |
+| `lib/ai/generate.ts` | Example selection, prompt assembly, full and per-block generation |
+| `lib/ai/profile.ts` | Build or refresh the voice profile |
+| `lib/ai/ingest.ts` | HTML / .eml / screenshot → clean copy |
+| `lib/ai/client.ts` | Claude client, structured-output streaming, cost estimate, error mapping |
+| `lib/types.ts` | Zod schemas for everything stored and everything Claude returns |
+| `lib/lint.ts` | Rule checks on drafts |
+| `lib/store.ts` | JSON file storage |
+| `app/api/**` | Local API routes |
+| `app/**/page.tsx`, `components/**` | UI |
+
+See [docs/DESIGN.md](docs/DESIGN.md) for the design.
