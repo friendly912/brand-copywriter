@@ -312,8 +312,21 @@ export const Settings = z.object({
   refreshAfterFinals: z.number().int().min(1).default(5),
   /** Run the self-review pass automatically after every new email. */
   autoReview: z.boolean().default(false),
+  // OpenRouter: the next option after Claude (used when Claude fails or has no key).
+  openrouterApiKey: z.string().default(""),
+  openrouterModel: z.string().default("openai/gpt-6-sol"),
+  openrouterEnabled: z.boolean().default(true),
 });
 export type Settings = z.infer<typeof Settings>;
 
 /** What the browser is allowed to see: never the key itself. */
-export type PublicSettings = Omit<Settings, "apiKey"> & { apiKeySet: boolean; apiKeyHint: string; apiKeyFromEnv: boolean };
+export type PublicSettings = Omit<Settings, "apiKey" | "openrouterApiKey"> & {
+  apiKeySet: boolean;
+  apiKeyHint: string;
+  apiKeyFromEnv: boolean;
+  openrouterKeySet: boolean;
+  openrouterKeyHint: string;
+  openrouterKeyFromEnv: boolean;
+  /** At least one provider can be used. */
+  anyProvider: boolean;
+};

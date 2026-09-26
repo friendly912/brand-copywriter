@@ -10,8 +10,8 @@ export function Nav() {
   const [keyMissing, setKeyMissing] = useState(false);
 
   useEffect(() => {
-    api<{ apiKeySet: boolean }>("/api/settings")
-      .then((s) => setKeyMissing(!s.apiKeySet))
+    api<{ anyProvider: boolean }>("/api/settings")
+      .then((s) => setKeyMissing(!s.anyProvider))
       .catch(() => {});
   }, [path]);
 
@@ -38,7 +38,7 @@ export function Nav() {
       </header>
       {keyMissing && path !== "/settings" && (
         <div className="banner warn" style={{ borderRadius: 0 }}>
-          No Claude API key yet. <Link href="/settings">Add it in Settings</Link> to start writing.
+          No API key yet. <Link href="/settings">Add a Claude key in Settings</Link> to start writing.
         </div>
       )}
     </>

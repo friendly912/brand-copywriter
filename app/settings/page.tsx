@@ -11,12 +11,19 @@ export default function SettingsPage() {
   const toast = useToast();
   const [s, setS] = useState<S | null>(null);
   const [key, setKey] = useState("");
+  const [orKey, setOrKey] = useState("");
+  const [orModel, setOrModel] = useState("");
   const [error, setError] = useState("");
-  const [test, setTest] = useState<{ ok: boolean; msg: string } | null>(null);
-  const [testing, setTesting] = useState(false);
+  const [test, setTest] = useState<{ provider: "claude" | "openrouter"; ok: boolean; msg: string } | null>(null);
+  const [testing, setTesting] = useState<"claude" | "openrouter" | null>(null);
 
   useEffect(() => {
-    api<S>("/api/settings").then(setS).catch((e) => setError(e.message));
+    api<S>("/api/settings")
+      .then((x) => {
+        setS(x);
+        setOrModel(x.openrouterModel);
+      })
+      .catch((e) => setError(e.message));
   }, []);
 
   async function save(patch: Record<string, unknown>) {
@@ -31,16 +38,16 @@ export default function SettingsPage() {
     }
   }
 
-  async function runTest() {
-    setTesting(true);
+  async function runTest(provider: "claude" | "openrouter") {
+    setTesting(provider);
     setTest(null);
     try {
-      const r = await api<{ reply: string; model: string }>("/api/settings/test", { method: "POST" });
-      setTest({ ok: true, msg: `Connected. ${r.model} replied “${r.reply}”.` });
+      const r = await api<{ reply: string; model: string }>("/api/settings/test", { method: "POST", json: { provider } });
+      setTest({ provider, ok: true, msg: `Connected. ${r.model} replied “${r.reply}”.` });
     } catch (e) {
-      setTest({ ok: false, msg: (e as Error).message });
+      setTest({ provider, ok: false, msg: (e as Error).message });
     } finally {
-      setTesting(false);
+      setTesting(null);
     }
   }
 
@@ -80,8 +87,8 @@ export default function SettingsPage() {
             </button>
           </div>
           <div className="row">
-            <button className="btn" disabled={!s.apiKeySet || testing} onClick={runTest}>
-              {testing ? "Testing…" : "Test connection"}
+            <button className="btn" disabled={!s.apiKeySet || !!testing} onClick={() => runTest("claude")}>
+              {testing === "claude" ? "Testing…" : "Test connection"}
             </button>
             {s.apiKeySet && !s.apiKeyFromEnv && (
               <button className="btn ghost danger" onClick={() => confirm("Remove the saved API key?") && save({ clearKey: true })}>
@@ -89,7 +96,70 @@ export default function SettingsPage() {
               </button>
             )}
           </div>
-          {test && <div className={`banner ${test.ok ? "ok" : "err"}`}>{test.msg}</div>}
+          {test?.provider === "claude" && <div className={`banner ${test.ok ? "ok" : "err"}`}>{test.msg}</div>}
+        </div>
+
+        <div className="card stack">
+          <div className="row between">
+            <h2>OpenRouter (next option after Claude)</h2>
+            <label className="check">
+              <input type="checkbox" checked={s.openrouterEnabled} onChange={(e) => save({ openrouterEnabled: e.target.checked })} /> Enabled
+            </label>
+          </div>
+          <p className="muted small">
+            If a Claude request fails (outage, rate limit, rejected key, refusal) or no Claude key is set, the same request is sent to this{" "}
+            <a href="https://openrouter.ai/models" target="_blank" rel="noreferrer">OpenRouter</a> model instead. Get a key at{" "}
+            <a href="https://openrouter.ai/settings/keys" target="_blank" rel="noreferrer">openrouter.ai</a>. Pick a model that supports structured outputs.
+          </p>
+          {s.openrouterKeySet && (
+            <div className="banner ok">
+              Key set ({s.openrouterKeyHint}){s.openrouterKeyFromEnv ? ", from the OPENROUTER_API_KEY environment variable" : ""}.
+            </div>
+          )}
+          <div className="row" style={{ flexWrap: "nowrap" }}>
+            <input
+              type="password"
+              placeholder={s.openrouterKeySet ? "Paste a new key to replace it" : "sk-or-…"}
+              value={orKey}
+              onChange={(e) => setOrKey(e.target.value)}
+              autoComplete="off"
+            />
+            <button
+              className="btn primary"
+              disabled={!orKey.trim()}
+              onClick={async () => {
+                if (await save({ openrouterApiKey: orKey })) setOrKey("");
+              }}
+            >
+              Save key
+            </button>
+          </div>
+          <label className="field">
+            <span>Model</span>
+            <small>An OpenRouter model id. A model from another company keeps working if Anthropic itself is down.</small>
+            <div className="row" style={{ flexWrap: "nowrap" }}>
+              <input value={orModel} onChange={(e) => setOrModel(e.target.value)} list="or-models" placeholder="openai/gpt-6-sol" style={{ fontFamily: "var(--mono)" }} />
+              <datalist id="or-models">
+                {["openai/gpt-6-sol", "google/gemini-3.8-flash", "anthropic/claude-sonnet-5", "anthropic/claude-opus-5"].map((m) => (
+                  <option key={m} value={m} />
+                ))}
+              </datalist>
+              <button className="btn" disabled={!orModel.trim() || orModel.trim() === s.openrouterModel} onClick={() => save({ openrouterModel: orModel.trim() })}>
+                Save model
+              </button>
+            </div>
+          </label>
+          <div className="row">
+            <button className="btn" disabled={!s.openrouterKeySet || !s.openrouterEnabled || !!testing} onClick={() => runTest("openrouter")}>
+              {testing === "openrouter" ? "Testing…" : "Test OpenRouter"}
+            </button>
+            {s.openrouterKeySet && !s.openrouterKeyFromEnv && (
+              <button className="btn ghost danger" onClick={() => confirm("Remove the saved OpenRouter key?") && save({ clearOpenrouterKey: true })}>
+                Remove key
+              </button>
+            )}
+          </div>
+          {test?.provider === "openrouter" && <div className={`banner ${test.ok ? "ok" : "err"}`}>{test.msg}</div>}
         </div>
 
         <div className="card stack">
@@ -139,7 +209,9 @@ export default function SettingsPage() {
           <p>
             This month: <strong>{fmtUsd(s.spend.monthUsd)}</strong> · All time: <strong>{fmtUsd(s.spend.totalUsd)}</strong> across {s.spend.calls} writing requests
           </p>
-          <p className="small faint">Estimated from token counts for email writing and rewrites. Profile builds and screenshot reading aren't included. Your Claude Console shows the exact bill.</p>
+          <p className="small faint">
+            Covers email writing, rewrites and reviews. Claude costs are estimated from token counts; OpenRouter costs are the amounts OpenRouter reports. Profile builds and document reading aren't included. Your Claude Console and OpenRouter dashboard show the exact bills.
+          </p>
         </div>
 
         {error && <div className="banner err">{error}</div>}
